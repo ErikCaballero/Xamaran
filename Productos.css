@@ -48,6 +48,19 @@
       color: #ff66c4;
     }
 
+   .imagenpaquete{
+      width: 50%;
+      animation: shake 4s infinite;
+   }
+   @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-5px) rotate(-1deg); }
+      40% { transform: translateX(5px) rotate(1deg); }
+      60% { transform: translateX(-5px) rotate(-1deg); }
+      80% { transform: translateX(5px) rotate(1deg); }
+      100% { transform: translateX(0); }
+   }
+
     footer {
       background: #ff66c4;
       color: white;
@@ -56,4 +69,5 @@
       margin-top: 40px;
 
     }
+
 
