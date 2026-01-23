@@ -48,10 +48,17 @@
       color: #ff66c4;
     }
 
+   
+
    .imagenpaquete{
-      width: 50%;
-      animation: shake 4s infinite;
+      width: 25%;
+      height: auto;
    }
+
+   .imagenpaquete::hover {
+      animation: shake 3s infinite;
+   }
+
    @keyframes shake {
       0% { transform: translateX(0); }
       20% { transform: translateX(-5px) rotate(-1deg); }
@@ -69,5 +76,6 @@
       margin-top: 40px;
 
     }
+
 
 
