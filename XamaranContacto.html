@@ -29,12 +29,29 @@
       <p><b>Email:</b> Xamaran@gmail.com</p>
     </div>
 
-    <form>
-      <input type="text" placeholder="Tu nombre" required />
-      <input type="email" placeholder="Tu correo" required />
-      <textarea placeholder="Escribe tu mensaje..."></textarea>
-      <button>Enviar mensaje</button>
-    </form>
+    <form id="contact-form">
+    <input type="text" id="user_name" placeholder="Tu nombre" required>
+    <input type="email" id="user_email" placeholder="Tu correo" required>
+    <textarea id="message" placeholder="Escribe tu mensaje"></textarea>
+    <button type="submit">Enviar Correo</button>
+</form>
+
+<script>
+document.getElementById('contact-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Estos IDs los sacas de tu panel de EmailJS
+    const serviceID = 'default_service';
+    const templateID = 'template_08ybk3h';
+
+    emailjs.sendForm(serviceID, templateID, this)
+        .then(() => {
+            alert('¡Enviado con éxito! 🚀');
+        }, (err) => {
+            alert('Error al enviar: ' + JSON.stringify(err));
+        });
+});
+</script>
   </div>
 
   <div class="social-media" style="text-align:center; margin-top:40px;">
@@ -52,5 +69,13 @@
   <footer>
     <p>Txutxe Denda - Xamarian © 2025</p>
   </footer>
+  
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+<script type="text/javascript">
+  (function() {
+    emailjs.init("6XHWOcP7oLjlypyOP");
+  })();
+</script>
 </body>
 </html>
