@@ -22,80 +22,33 @@
   <div class="section-block">
     <h2>Gominolas</h2>
     <section class="grid">
-      <div class="card">
-        <img src="https://m.media-amazon.com/images/I/81VW6cwj37L._AC_UF1000,1000_QL80_.jpg" alt="Gominolas surtidas">
-        <h3>Gominolas Surtidas</h3>
-        <p>Diversos sabores y colores.</p>
-        <p class="price">1,80€ / 100g</p>
-      </div>
-      <div class="card">
-        <img src="https://www.elglasse.com/media/items/3b657-clauanglesa.jpg" alt="Pica pica">
-        <h3>Pica Pica</h3>
-        <p>Para quienes buscan un toque ácido.</p>
-        <p class="price">1,80€ / 100g</p>
-      </div>
-      <div class="card">
-        <img src="https://citymagazine.b-cdn.net/wp-content/uploads/2016/01/maxresdefault-13.jpg" alt="Gominola de Coca-Cola">
-        <h3>Gominola de Coca-Cola</h3>
-        <p>El único sabor de la Coca-Cola en unas gominolas.</p>
-        <p class="price">1,80€ / 100g</p>
-      </div>
+      <div class="paquete">
+      <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png" alt="Paquete de snack">
+    </div>
+      <div class="paquete">
+      <img class="imagenchocolate" src="img/chocolate1.png" alt="Chocolate lleno">
+      <img class="imagenchocolate" src="img/chocolate2.png" alt="Chocolate mordido">
+      <img class="imagenchocolate" src="img/chocolate3.png" alt="Chcolate medio comido">
+    </div>
+    <div class="paquete">
+      <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png" alt="Paquete de snack">
+    </div>
+    <div class="paquete">
+      <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png" alt="Paquete de snack">
+    </div>
+    <div class="paquete">
+      <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png" alt="Paquete de snack">
+    </div>
     </section>
   </div>
 
   <div class="section-block">
-    <h2>Chocolatinas</h2>
+    <h2>Productos</h2>
     <section class="grid">
-      <div class="card">
-        <img src="https://buy.am/media/image/17/d9/3e/supermarket-am-6836.jpg" alt="Chocolates">
-        <h3>KitKat</h3>
-        <p>Para los amantes del cacao.</p>
-        <p class="price">1,00€</p>
-      </div>
-      <div class="card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Huesitos_Valor.jpg" alt="Toblerone">
-        <h3>Huesitos</h3>
-        <p>Huesitos, una delicia de chocolate y galleta.</p>
-        <p class="price">1,30€</p>
-      </div>
-      <div class="card">
-        <img src="https://i.ebayimg.com/images/g/HaQAAOSwtAxiPMze/s-l1200.jpg" alt="Chocolate con leche">
-        <h3>Kinder bueno</h3>
-        <p>Como su propio nombre indica, es bueno, Kinder Bueno, un sabor excelente para un producto excelente.</p>
-        <p class="price">1,20€</p>
+      
     </section>
   </div>
 
-  <div class="section-block">
-    <h2>Snacks</h2>
-    <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png">
-    <section class="grid">
-      <div class="card">
-        <img src="https://i.pinimg.com/736x/4c/9f/87/4c9f878916baecc6385e3372be54727b.jpg" alt="Doritos">
-        <h3>Doritos</h3>
-        <p>Crujientes y con mucho sabor.</p>
-        <p class="price">1,60€</p>
-      </div>
-      <div class="card">
-        <img src="https://images.ecestaticos.com/x5-tCL1SmZGbFxQ8p8Nyuh60FRc=/11x152:2124x1264/600x315/filters:fill(white):format(jpg)/f.elconfidencial.com%2Foriginal%2F27a%2F279%2F1d1%2F27a2791d186cba6054f0e04e2adbb6aa.jpg" alt="Patatas">
-        <h3>Patatas</h3>
-        <p>El más clásico de los snacks.</p>
-        <p class="price">1,55€ unidad</p>
-      </div>
-      <div class="card">
-        <img src="https://risi.es/static/img/montana-gusanitos.png" alt="Gusanitos">
-        <h3>Gusanitos</h3>
-        <p>Sabores explosivos y divertidos.</p>
-        <p class="price">1,55€ unidad</p>
-      </div>
-      <div class="card">
-        <img src="https://www.lavanguardia.com/files/og_thumbnail/uploads/2023/12/19/6581cb9b970e2.jpeg" alt="maices">
-        <h3>Kikos</h3>
-        <p>Crujientes como ningún otro snack y delicioso.</p>
-        <p class="price">1,30€ unidad</p>
-      </div>
-    </section>
-  </div>
 
   <footer>
     <h3>Contacto</h3>
@@ -103,5 +56,73 @@
     <p>Horario: 17:00 - 21:30</p>
     <p>Txutxe Denda - Xamarian © 2025</p>
   </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      // preload common sounds
+      const biteSound = new Audio('sonidos/Mordisco.mp3');
+      biteSound.preload = 'auto';
+      biteSound.volume = 0.9;
+
+      const shakeSrc = 'sonidos/Sacudirpaquete.mp3';
+
+      document.querySelectorAll('.paquete').forEach(function(p){
+        p.style.cursor = 'pointer';
+
+        // --- chocolate cycling behavior (if multiple imagenchocolate images present) ---
+        const chocImgs = Array.from(p.querySelectorAll('img.imagenchocolate'));
+        if (chocImgs.length >= 2) {
+          const srcs = chocImgs.map(function(i){ return i.src; });
+          const main = chocImgs[0];
+          chocImgs.slice(1).forEach(function(i){ i.remove(); });
+
+          let idx = 0;
+          let intervalId = null;
+
+          p.addEventListener('mouseenter', function(){
+            // play bite sound once on hover
+            try {
+              biteSound.currentTime = 0;
+              const playPromise = biteSound.play();
+              if (playPromise !== undefined) playPromise.catch(function(){});
+            } catch(e){}
+
+            if (intervalId) return;
+            intervalId = setInterval(function(){
+              idx = (idx + 1) % srcs.length;
+              main.src = srcs[idx];
+            }, 350);
+          });
+
+          p.addEventListener('mouseleave', function(){
+            if (intervalId) { clearInterval(intervalId); intervalId = null; }
+            idx = 0; main.src = srcs[0];
+            try { biteSound.pause(); biteSound.currentTime = 0; } catch(e){}
+          });
+        }
+
+        // --- shake sound loop for paquetes with imagenpaquete ---
+        const packImg = p.querySelector('img.imagenpaquete');
+        if (packImg) {
+          // create a dedicated audio instance per paquete so multiple hovers can play independently
+          const shakeAudio = new Audio(shakeSrc);
+          shakeAudio.preload = 'auto';
+          shakeAudio.loop = true;
+          shakeAudio.volume = 0.7;
+
+          p.addEventListener('mouseenter', function(){
+            try {
+              shakeAudio.currentTime = 0;
+              const playPromise = shakeAudio.play();
+              if (playPromise !== undefined) playPromise.catch(function(){});
+            } catch(e){}
+          });
+
+          p.addEventListener('mouseleave', function(){
+            try { shakeAudio.pause(); shakeAudio.currentTime = 0; } catch(e){}
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html>

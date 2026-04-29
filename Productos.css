@@ -50,23 +50,76 @@
 
    
 
-   .imagenpaquete{
-      width: 25%;
-      height: auto;
-   }
+  .paquete{
+    display: block;
+    position: relative;
+    width: 200px;
+    max-width: calc(100% - 40px);
+    aspect-ratio: 1 / 1; /* keep perfect circle */
+    margin: 0 auto 20px auto;
+    text-align: center;
+    border-radius: 50%;
+    overflow: hidden; /* clip image to the circle */
+    background: radial-gradient(circle at 30% 30%, #b16aff 0%, #8a2be2 45%, #6a00cc 100%);
+    box-shadow: 0 8px 20px rgba(106,0,204,0.12);
+    transition: transform .25s ease, box-shadow .25s ease;
+    justify-self: center; /* center within grid cell */
+  }
 
-   .imagenpaquete::hover {
-      animation: shake 3s infinite;
-   }
+  .imagenpaquete{
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* keeps aspect and fills circle */
+    display: block;
+    position: relative;
+    will-change: transform;
+    transition: transform .25s ease;
+  }
 
-   @keyframes shake {
-      0% { transform: translateX(0); }
-      20% { transform: translateX(-5px) rotate(-1deg); }
-      40% { transform: translateX(5px) rotate(1deg); }
-      60% { transform: translateX(-5px) rotate(-1deg); }
-      80% { transform: translateX(5px) rotate(1deg); }
-      100% { transform: translateX(0); }
-   }
+  /* Uniform size for chocolate images */
+  .imagenchocolate{
+    width: 160px;
+    max-width: 80%;
+    height: 150px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px;
+    bottom: 0;
+    }
+    /* move chocolate slightly down inside its paquete */
+    .paquete .imagenchocolate{
+      transform: translateY(25px);
+      transition: transform .25s ease;
+    }
+
+    @media (max-width: 480px) {
+      .paquete .imagenchocolate{ transform: translateY(12px); }
+    }
+  
+
+  .paquete:hover{
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 18px 36px rgba(106,0,204,0.18);
+  }
+
+  /* play shake once per hover to avoid continuous movement */
+  .paquete:hover .imagenpaquete {
+    animation: shake .6s linear 1;
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0) rotate(0deg); }
+    10% { transform: translateX(-6px) rotate(-3deg); }
+    20% { transform: translateX(6px) rotate(3deg); }
+    30% { transform: translateX(-4px) rotate(-2deg); }
+    40% { transform: translateX(4px) rotate(2deg); }
+    50% { transform: translateX(-2px) rotate(-1deg); }
+    60% { transform: translateX(2px) rotate(1deg); }
+    70% { transform: translateX(-1px) rotate(-0.5deg); }
+    80% { transform: translateX(1px) rotate(0.5deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+  }
 
     footer {
       background: #ff66c4;
