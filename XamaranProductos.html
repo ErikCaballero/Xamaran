@@ -20,24 +20,30 @@
   </nav>
 
   <div class="section-block">
-    <h2>Gominolas</h2>
+    <h2>Productos</h2>
     <section class="grid">
-      <div class="paquete">
+      <div class="paquete" id="menupatatas">
       <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png" alt="Paquete de snack">
     </div>
-      <div class="paquete">
+      <div class="paquete" id="menuchocolate">
       <img class="imagenchocolate" src="img/chocolate1.png" alt="Chocolate lleno">
       <img class="imagenchocolate" src="img/chocolate2.png" alt="Chocolate mordido">
       <img class="imagenchocolate" src="img/chocolate3.png" alt="Chcolate medio comido">
     </div>
-    <div class="paquete">
-      <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png" alt="Paquete de snack">
+    <div class="paquete" id="menuchuches">
+        <img class="r1" src="img/chuche1.png" alt="Chocolate lleno">
+        <img class="r2" src="img/chuche2.png" alt="Chocolate mordido">
+        <img class="r3" src="img/chuche3.png" alt="Chcolate medio comido">
     </div>
-    <div class="paquete">
-      <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png" alt="Paquete de snack">
+    <div class="paquete" id="menuhelados">
+      <img class="imagenhelado" src="img/helado1.png" alt="Helado entero">
+      <img class="imagenhelado" src="img/helado2.png" alt="Helado un poco derretido">
+      <img class="imagenhelado" src="img/helado3.png" alt="Helado muy derretido">
+      <img class="imagenhelado" src="img/helado4.png" alt="Helado super derretido">
     </div>
-    <div class="paquete">
-      <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png" alt="Paquete de snack">
+    <div class="paquete" id="menulata">
+      <img class="imagenlata" src="img/latacocacola1.png" alt="Lata de cocalola cerrada">
+      <img class="imagenlata" src="img/latacocacola2.png" alt="Lata de cocalola abierta">
     </div>
     </section>
   </div>
@@ -67,38 +73,39 @@
 
       document.querySelectorAll('.paquete').forEach(function(p){
         p.style.cursor = 'pointer';
+        // --- cycling behavior for chocolate and helado (if multiple images present) ---
+        ['imagenchocolate', 'imagenhelado'].forEach(function(cls){
+          const imgs = Array.from(p.querySelectorAll('img.' + cls));
+          if (imgs.length >= 2) {
+            const srcs = imgs.map(function(i){ return i.src; });
+            const main = imgs[0];
+            imgs.slice(1).forEach(function(i){ i.remove(); });
 
-        // --- chocolate cycling behavior (if multiple imagenchocolate images present) ---
-        const chocImgs = Array.from(p.querySelectorAll('img.imagenchocolate'));
-        if (chocImgs.length >= 2) {
-          const srcs = chocImgs.map(function(i){ return i.src; });
-          const main = chocImgs[0];
-          chocImgs.slice(1).forEach(function(i){ i.remove(); });
+            let idx = 0;
+            let intervalId = null;
 
-          let idx = 0;
-          let intervalId = null;
+            p.addEventListener('mouseenter', function(){
+              // play bite sound once on hover
+              try {
+                biteSound.currentTime = 0;
+                const playPromise = biteSound.play();
+                if (playPromise !== undefined) playPromise.catch(function(){});
+              } catch(e){}
 
-          p.addEventListener('mouseenter', function(){
-            // play bite sound once on hover
-            try {
-              biteSound.currentTime = 0;
-              const playPromise = biteSound.play();
-              if (playPromise !== undefined) playPromise.catch(function(){});
-            } catch(e){}
+              if (intervalId) return;
+              intervalId = setInterval(function(){
+                idx = (idx + 1) % srcs.length;
+                main.src = srcs[idx];
+              }, 350);
+            });
 
-            if (intervalId) return;
-            intervalId = setInterval(function(){
-              idx = (idx + 1) % srcs.length;
-              main.src = srcs[idx];
-            }, 350);
-          });
-
-          p.addEventListener('mouseleave', function(){
-            if (intervalId) { clearInterval(intervalId); intervalId = null; }
-            idx = 0; main.src = srcs[0];
-            try { biteSound.pause(); biteSound.currentTime = 0; } catch(e){}
-          });
-        }
+            p.addEventListener('mouseleave', function(){
+              if (intervalId) { clearInterval(intervalId); intervalId = null; }
+              idx = 0; main.src = srcs[0];
+              try { biteSound.pause(); biteSound.currentTime = 0; } catch(e){}
+            });
+          }
+        });
 
         // --- shake sound loop for paquetes with imagenpaquete ---
         const packImg = p.querySelector('img.imagenpaquete');
@@ -106,7 +113,7 @@
           // create a dedicated audio instance per paquete so multiple hovers can play independently
           const shakeAudio = new Audio(shakeSrc);
           shakeAudio.preload = 'auto';
-          shakeAudio.loop = true;
+          shakeAudio.loop = false;
           shakeAudio.volume = 0.7;
 
           p.addEventListener('mouseenter', function(){
@@ -119,6 +126,63 @@
 
           p.addEventListener('mouseleave', function(){
             try { shakeAudio.pause(); shakeAudio.currentTime = 0; } catch(e){}
+          });
+        }
+
+        // --- special behavior for menulata: play Lataabierta once and swap image once per hover ---
+        const lataImgs = Array.from(p.querySelectorAll('img.imagenlata'));
+        if (p.id === 'menulata' && lataImgs.length >= 2) {
+          const srcs = lataImgs.map(function(i){ return i.src; });
+          const main = lataImgs[0];
+          lataImgs.slice(1).forEach(function(i){ i.remove(); });
+
+          const lataAudio = new Audio('sonidos/Lataabierta.mp3');
+          lataAudio.preload = 'auto';
+          lataAudio.loop = false;
+          lataAudio.volume = 0.95;
+
+          let opened = false;
+
+          p.addEventListener('mouseenter', function(){
+            if (opened) return; // ensure it happens once per hover
+            opened = true;
+            main.src = srcs[1];
+            try {
+              lataAudio.currentTime = 0;
+              const playPromise = lataAudio.play();
+              if (playPromise !== undefined) playPromise.catch(function(){});
+            } catch(e){}
+          });
+
+          p.addEventListener('mouseleave', function(){
+            if (!opened) return;
+            opened = false;
+            main.src = srcs[0];
+            try { lataAudio.pause(); lataAudio.currentTime = 0; } catch(e){}
+          });
+        }
+
+        // --- play malabares sound when hovering any of the r elements (.r1, .r2, .r3) ---
+        const rEls = Array.from(p.querySelectorAll('.r1, .r2, .r3'));
+        if (rEls.length) {
+          // use specific malabares sound for the menuchuches block, otherwise fallback to shakeSrc
+          const malabaresSrc = (p.id === 'menuchuches') ? 'sonidos/Malabares.mp3' : shakeSrc;
+          const malabaresAudio = new Audio(malabaresSrc);
+          malabaresAudio.preload = 'auto';
+          malabaresAudio.loop = false;
+          malabaresAudio.volume = 0.85;
+
+          rEls.forEach(function(el){
+            el.addEventListener('mouseenter', function(){
+              try {
+                malabaresAudio.currentTime = 0;
+                const playPromise = malabaresAudio.play();
+                if (playPromise !== undefined) playPromise.catch(function(){});
+              } catch(e){}
+            });
+            el.addEventListener('mouseleave', function(){
+              try { malabaresAudio.pause(); malabaresAudio.currentTime = 0; } catch(e){}
+            });
           });
         }
       });

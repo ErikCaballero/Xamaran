@@ -93,6 +93,23 @@
       transition: transform .25s ease;
     }
 
+    /* Uniform size for helado images (same as chocolate) */
+    .imagenhelado{
+      width: 160px;
+      max-width: 80%;
+      height: 150px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+      border-radius: 12px;
+      bottom: 0;
+    }
+    /* move helado slightly down inside its paquete */
+    .paquete .imagenhelado{
+      transform: translateY(25px);
+      transition: transform .25s ease;
+    }
+
     @media (max-width: 480px) {
       .paquete .imagenchocolate{ transform: translateY(12px); }
     }
@@ -130,5 +147,54 @@
 
     }
 
+.r1, .r2, .r3 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 80px; /* Ajustado para que no se salgan del círculo */
+  width: auto;
+  object-fit: contain;
+  /* El secreto: el primer translate(-50%, -50%) las centra perfectamente */
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+
+/* Por defecto están quietas (sin animación) */
+.r1 { transform: translate(-80%, -20%) }
+.r2 { transform: translate(-50%, -80%)}
+.r3 { transform: translate(-20%, -20%)}
+/* 4. Animación de malabarismo centrada */
+@keyframes swap {
+  0%, 100% {
+    /* Centro + un poco a la izquierda y abajo */
+    transform: translate(-80%, -20%) scale(1);
+    z-index: 1;
+  }
+  33% {
+    /* Centro + arriba */
+    transform: translate(-50%, -80%) scale(1.1);
+    z-index: 3;
+  }
+  66% {
+    /* Centro + un poco a la derecha y abajo */
+    transform: translate(-20%, -20%) scale(1);
+    z-index: 2;
+  }
+}
 
 
+/* Iniciar la animación solo al pasar el ratón sobre el paquete */
+.paquete:hover .r1 { animation: swap 6s infinite ease-in-out; animation-delay: 0s; }
+.paquete:hover .r2 { animation: swap 6s infinite ease-in-out; animation-delay: -2s; }
+.paquete:hover .r3 { animation: swap 6s infinite ease-in-out; animation-delay: -4s; }
+
+.imagenlata{
+      width: 100%;
+      max-width: 80%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+      border-radius: 12px;
+      bottom: -12;
+    }

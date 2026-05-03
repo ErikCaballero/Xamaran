@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Configuración - Horarios e Imágenes</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; padding: 20px; }
+        .schedule-form, .image-form { max-width:700px; margin:20px auto; padding:16px; background:#fff; border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,.1); }
+        .day-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+        .day-row label { width:100px; font-weight: bold; }
+        .day-row input[type="time"] { flex:1; padding: 4px; }
+        .actions { text-align:right; margin-top:12px; }
+        .preview { max-width:700px; margin:12px auto; padding:12px; background:#f9f9f9; border-radius:6px; border: 1px solid #ddd; }
+        button { cursor: pointer; padding: 8px 16px; border-radius: 4px; border: none; font-weight: bold; }
+        button[type="submit"], .btn-primary { background: #007bff; color: white; }
+        #resetBtn { background: #dc3545; color: white; }
+        
+        /* Estilos nuevos para imagen */
+        .image-manager { display: flex; flex-direction: column; gap: 10px; }
+        #imgUrlDisplay { font-size: 0.85em; word-break: break-all; color: #555; background: #eee; padding: 5px; border-radius: 4px; margin-top: 10px; }
+        #imgPreview { max-width: 150px; margin-top: 10px; border-radius: 4px; display: none; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Configuración</h1>
+        
+        <section class="schedule-form" aria-labelledby="horarios-title">
+            <h2 id="horarios-title">Editar Horarios</h2>
+            <form id="horariosForm">
+                <div id="daysContainer"></div>
+                <div class="actions">
+                    <button type="submit">Guardar horarios</button>
+                    <button type="button" id="resetBtn">Restablecer</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="image-form">
+            <h2>Logo / Imagen de la Web</h2>
+            <div class="image-manager">
+                <input type="file" id="archivoInput" accept="image/*">
+                <button type="button" id="btnSubirImagen" class="btn-primary">Subir Imagen a la Nube</button>
+                <div id="uploadStatus"></div>
+                <img id="imgPreview" src="" alt="Vista previa">
+                <div id="imgUrlDisplay">La URL de la imagen aparecerá aquí al subirla.</div>
+            </div>
+        </section>
+
+        <section class="preview" aria-live="polite">
+            <h3>Horario actual (Vista Previa)</h3>
+            <div id="horariosPreview">Cargando datos desde la nube...</div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // 1. CONFIGURACIÓN
+        const SUPABASE_URL = 'https://cbtvetmvxvxhidsgpcoh.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNidHZldG12eHZ4aGlkc2dwY29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MzM4NzMsImV4cCI6MjA4NzQwOTg3M30.kphDJaqTCBzHuDSraol0gaDOTMfYf7eHNHaQGy3Ab7o';
+        
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const days = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+        const container = document.getElementById('daysContainer');
+        const preview = document.getElementById('horariosPreview');
+
+        // --- LÓGICA DE HORARIOS (SIN CAMBIOS) ---
+
+        async function loadHorarios() {
+            preview.textContent = 'Cargando horarios...';
+            let { data, error } = await _supabase.from('Horarios').select('*');
+            if (error) {
+                console.error("Error:", error);
+                preview.textContent = 'Error: ' + error.message;
+                return;
+            }
+            const initial = {};
+            data.forEach(item => {
+                if (item.hora && item.hora.includes(' - ')) {
+                    const partes = item.hora.split(' - ');
+                    initial[item.Dia] = { start: partes[0], end: partes[1] };
+                }
+            });
+            buildForm(initial);
+            renderPreview(initial);
+        }
+
+        async function saveHorarios(data) {
+            const rows = Object.keys(data).map(day => {
+                const start = data[day].start || '00:00';
+                const end = data[day].end || '00:00';
+                return { Dia: day, hora: `${start} - ${end}` };
+            });
+            const { error } = await _supabase.from('Horarios').upsert(rows, { onConflict: 'Dia' });
+            if (error) {
+                alert('Error al guardar: ' + error.message);
+            } else {
+                alert('¡Horarios actualizados en Supabase!');
+                loadHorarios();
+            }
+        }
+
+        function buildForm(initial = {}) {
+            container.innerHTML = '';
+            days.forEach((day, i) => {
+                const row = document.createElement('div');
+                row.className = 'day-row';
+                row.innerHTML = `<label>${day}</label>
+                    <input type="time" id="start-${i}" value="${initial[day]?.start || ''}">
+                    <span>—</span>
+                    <input type="time" id="end-${i}" value="${initial[day]?.end || ''}">`;
+                container.appendChild(row);
+            });
+        }
+
+        function renderPreview(obj) {
+            if (!obj || Object.keys(obj).length === 0) {
+                preview.innerHTML = 'No hay horarios guardados.';
+                return;
+            }
+            const html = days.map(d => {
+                const entry = obj[d];
+                const texto = (entry && entry.start && entry.end) 
+                    ? `${entry.start} — ${entry.end}` : '<span style="color:red">Cerrado / No definido</span>';
+                return `<div><strong>${d}:</strong> ${texto}</div>`;
+            }).join('');
+            preview.innerHTML = html;
+        }
+
+        // --- LÓGICA DE IMAGEN (CORREGIDA PARA MANTENER NOMBRE ORIGINAL) ---
+
+        const btnSubir = document.getElementById('btnSubirImagen');
+        const fileInput = document.getElementById('archivoInput');
+        const statusText = document.getElementById('uploadStatus');
+        const urlDisplay = document.getElementById('imgUrlDisplay');
+        const imgPreview = document.getElementById('imgPreview');
+
+        btnSubir.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) return alert("Por favor, selecciona una imagen primero.");
+
+            statusText.textContent = `Subiendo "${file.name}"...`;
+            
+            // Usamos directamente el nombre original del archivo seleccionado
+            const fileName = file.name; 
+
+            // Subir a Supabase Storage (Bucket 'MeSacoLaPollaEnDirecto')
+            const { data, error } = await _supabase.storage
+                .from('MeSacoLaPollaEnDirecto')
+                .upload(fileName, file, {
+                    upsert: true // Esto permite que si subes otra con el mismo nombre, se reemplace
+                });
+
+            if (error) {
+                statusText.textContent = "Error al subir: " + error.message;
+            } else {
+                // Obtener URL Pública
+                const { data: publicData } = _supabase.storage
+                    .from('MeSacoLaPollaEnDirecto')
+                    .getPublicUrl(fileName);
+
+                const finalUrl = publicData.publicUrl;
+                
+                statusText.textContent = "¡Imagen subida con éxito!";
+                urlDisplay.textContent = "URL: " + finalUrl;
+                imgPreview.src = finalUrl;
+                imgPreview.style.display = "block";
+            }
+        });
+
+        // EVENTOS HORARIOS
+        document.getElementById('horariosForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = {};
+            days.forEach((d, i) => {
+                const start = document.getElementById(`start-${i}`).value;
+                const end = document.getElementById(`end-${i}`).value;
+                if (start || end) data[d] = { start, end };
+            });
+            await saveHorarios(data);
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', async () => {
+            if (!confirm('¿Restablecer todos los horarios a 00:00?')) return;
+            const resetData = {};
+            days.forEach(d => resetData[d] = { start: '00:00', end: '00:00' });
+            await saveHorarios(resetData);
+        });
+
+        loadHorarios();
+    </script>
+</body>
+</html>

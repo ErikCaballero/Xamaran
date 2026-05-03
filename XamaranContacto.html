@@ -28,7 +28,6 @@
 
     <div class="contact-info">
       <p><b>Dirección:</b> Errekatxu Kalea, 6, Bajo-Izquierda, 48100 Mungia, Bizkaia</p>
-      <p><b>Horario:</b> 17:00 - 21:30</p>
       <p><b>Teléfono:</b> 946 06 60 39</p>
       <p><b>Email:</b> xamarandulces@gmail.com</p>
     </div>
@@ -40,6 +39,8 @@
     <button type="submit">Enviar Correo</button>
 </form>
 
+
+  
 <script>
 document.getElementById('contact-form').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -57,6 +58,63 @@ document.getElementById('contact-form').addEventListener('submit', function(even
 });
 </script>
   </div>
+
+
+
+
+    <div class="contact-section">
+        <div class="contact-info">
+          <h2>Horarios de la tienda</h2>
+          <div id="listaHorarios" class="loading">Cargando horarios...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://cbtvetmvxvxhidsgpcoh.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNidHZldG12eHZ4aGlkc2dwY29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MzM4NzMsImV4cCI6MjA4NzQwOTg3M30.kphDJaqTCBzHuDSraol0gaDOTMfYf7eHNHaQGy3Ab7o';
+        
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const listaHorarios = document.getElementById('listaHorarios');
+        const diasOrdenados = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+
+        async function mostrarHorarios() {
+            let { data, error } = await _supabase
+                .from('Horarios') 
+                .select('Dia, hora');
+
+            if (error) {
+                listaHorarios.innerHTML = "Error al cargar los horarios.";
+                return;
+            }
+
+            // Convertimos los datos a un objeto para ordenarlos fácilmente
+            const mapeo = {};
+            data.forEach(item => mapeo[item.Dia] = item.hora);
+
+            // Generamos el HTML respetando el orden de la semana
+            const html = diasOrdenados.map(dia => {
+                let horaTexto = mapeo[dia] || "Cerrado";
+                
+                // Si la hora es 00:00 - 00:00, mostramos "Cerrado"
+                if (horaTexto === "00:00 - 00:00") {
+                    horaTexto = '<span class="cerrado">Cerrado</span>';
+                }
+
+                return `
+                    <div class="dia-fila">
+                        <span class="dia-nombre">${dia}:</span>
+                        <span class="dia-hora">${horaTexto}</span>
+                    </div>
+                `;
+            }).join('');
+
+            listaHorarios.classList.remove('loading');
+            listaHorarios.innerHTML = html;
+        }
+
+        mostrarHorarios();
+    </script>
 
   <div class="social-media" style="text-align:center; margin-top:40px;">
 <h2 style="color:#ff3fa8; text-shadow:1px 1px 4px rgba(0,0,0,0.1);">Síguenos en redes</h2>
@@ -83,6 +141,36 @@ document.getElementById('contact-form').addEventListener('submit', function(even
 <script type="text/javascript">
   (function() {
     emailjs.init("6XHWOcP7oLjlypyOP");
+  })();
+</script>
+<!-- Script: cargar y mostrar horarios guardados desde Config.html -->
+<script>
+  (function(){
+    const STORAGE_KEY = 'xamaran_horarios_v1';
+    const days = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+
+    function loadHorarios(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      }catch(e){ console.warn('Error leyendo horarios:', e); return null; }
+    }
+
+    function render(obj){
+      const container = document.getElementById('contactHorarios');
+      if(!container) return;
+      if(!obj){ container.innerHTML = '<p>No hay horarios configurados.</p>'; return; }
+      const html = days.map(d => {
+        const e = obj[d];
+        if(!e || !e.start || !e.end) return `<p><b>${d}:</b> Cerrado</p>`;
+        return `<p><b>${d}:</b> ${e.start} - ${e.end}</p>`;
+      }).join('');
+      container.innerHTML = html;
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      render(loadHorarios());
+    });
   })();
 </script>
 </body>
