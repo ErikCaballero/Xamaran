@@ -1,0 +1,43 @@
+/* Estilos para el carrusel */
+.carousel{
+  position:relative;
+  overflow:hidden;
+  max-width:100%;
+  margin:18px auto;
+}
+.carousel-track{
+  display:flex;
+  transition:transform .6s ease;
+  will-change:transform;
+}
+.slide{
+  min-width:100%;
+  box-sizing:border-box;
+}
+.slide img{
+  width:100%;
+  height:500px;
+  object-fit:cover;
+  display:block;
+}
+.carousel-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  background:rgba(0,0,0,0.45);
+  color:#fff;
+  border:none;
+  padding:10px 14px;
+  cursor:pointer;
+  font-size:22px;
+  border-radius:4px;
+  z-index:10;
+}
+.carousel-prev{ left:12px; }
+.carousel-next{ right:12px; }
+.carousel-btn:focus{ outline:2px solid #fff; }
+
+@media (max-width:600px){
+  .slide img{ height:220px; }
+  .carousel-btn{ padding:8px 10px; font-size:18px; }
+}

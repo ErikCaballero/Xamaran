@@ -7,6 +7,7 @@
   <link rel="shortcut icon" href="img/XamaranLogo.png" type="image/x-icon">
   <link rel="stylesheet" href="General.css">
   <link rel="stylesheet" href="Principal.css">
+  <link rel="stylesheet" href="carousel.css">
 </head>
 <body>
   <header>
@@ -18,6 +19,20 @@
     <a href="XamaranProductos.html">Productos</a>
     <a href="XamaranContacto.html">Contacto</a>
   </nav>
+
+  <!-- Carrusel de imágenes: empieza justo debajo del menú -->
+  <section class="carousel" aria-label="Carrusel de imágenes">
+    <div class="carousel-track">
+      <div class="slide"><img src="img/tienda animada.png" alt="Chuche 1"></div>
+      <div class="slide"><img src="img/tiendaDibujo.png" alt="Chuche 2"></div>
+      <div class="slide"><img src="img/TiendaNiñosFelices.png" alt="Chuche 3"></div>
+      <div class="slide"><img src="img/TiendaGenteFeliz.png" alt="Helado 1"></div>
+      <div class="slide"><img src="img/TiendaMar.png" alt="Helado 2"></div>
+      <div class="slide"><img src="img/TiendaAnder.png" alt="Helado 3"></div>
+    </div>
+    <button class="carousel-btn carousel-prev" aria-label="Anterior">&#10094;</button>
+    <button class="carousel-btn carousel-next" aria-label="Siguiente">&#10095;</button>
+  </section>
 
   <section class="hero" id="inicio">
     <h2>La tienda de chuches más colorida del barrio</h2>
@@ -49,5 +64,6 @@
     <p>Horario: 17:00 - 21:30</p>
     <p>Txutxe Denda - Xamarian © 2025</p>
   </footer>
+  <script src="carousel.js" defer></script>
 </body>
 </html>
