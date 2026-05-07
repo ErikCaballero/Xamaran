@@ -38,6 +38,8 @@
     <h2>La tienda de chuches más colorida del barrio</h2>
   </section>
 
+  
+
   <section class="productos" id="productos">
     <div class="producto">
       <img src="img/Chuches.png" alt="Chuches surtidas" />
@@ -56,6 +58,44 @@
     </div>
   </section>
 
+  <section class="personaliza-bolsa" aria-labelledby="titulo-personaliza">
+    <img src="img/Chuches.png" alt="Personaliza tu bolsa" />
+    <div class="personaliza-content">
+      <h3 id="titulo-personaliza">¡Personaliza tu bolsa de cumpleaños!</h3>
+      <p>Selecciona las chuches que quieres incluir en tu bolsa personalizada.</p>
+      <button class="btn-seleccionar">Seleccionar chuches</button>
+    </div>
+  </section>
+
+  <section class="entregas" id="entregas" aria-labelledby="titulo-entregas">
+    <div class="entregas-content">
+      <h3 id="titulo-entregas">📦 Entregas a domicilio 📦</h3>
+      <img src="img/Repartoimg.png" alt="">
+      <p>Recibe tus chuches en casa en un horario cómodo.</p>
+      <p>Nosotros te llevaremos las chuches allá a donde nos lo indiques.</p>
+    </div>
+    <div class="entregas-actions">
+      <button class="btn-ver-reglas" id="btn-ver-reglas">Ver reglas</button>
+    </div>
+  </section>
+
+  <!-- Modal reglas (oculto hasta abrir) -->
+  <div id="modal-reglas" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <button class="modal-close" id="modal-close" aria-label="Cerrar">×</button>
+      <h4 id="modal-titulo">Reglas de entrega a domicilio 🚚📦</h4>
+      <ul>
+        <li>Darnos su dirección de entrega.</li>
+        <li>Teléfono de contacto.</li>
+        <li>Los pagos se realizaran por Bizum (633618668) antes de la entrega</li>
+        <li>Pedido mínimo en Mungia (Zona local) 5 €.</li>
+        <li>Pedido mínimo resto de poblaciones (Atxuri, Laukariz, Zabalondo,    Larrauri, Meñaka, Maruri, Gatika, Trobika, Markaida, Gamiz-Fika, Gamiz, Fika) 8 €.</li>
+        <li><span><b>Recepción</b></span> de pedidos de 10:00 hasta las 20:00.</li>
+        <li><span><b>Reparto</b></span> de pedidos de 20:00 a 22:00.</li>
+        <li>Recordar Domingos <span style="font-weight: bold; color: red;">CERRADO</span></li>
+      </ul>
+    </div>
+  </div>
   
   <iframe src="https://widgets.sociablekit.com/google-reviews/iframe/25677428" frameborder="0" width="100%" height="500px"></iframe>
   <footer id="contacto">
@@ -65,5 +105,120 @@
     <p>Txutxe Denda - Xamarian © 2025</p>
   </footer>
   <script src="carousel.js" defer></script>
+  
+  <div class="sticky-contact" aria-label="Enlace rápido Xamaran">
+    <img class="sticky-contact__img" src="img/XamaranLogo.png" alt="Logo Xamaran">
+    <div class="sticky-contact__content">
+      <div class="sticky-contact__info">
+        <span class="sticky-contact__name">Xamaran</span>
+        <span class="sticky-contact__subtitle">¿Necesitas ayuda?</span>
+      </div>
+      <a class="sticky-contact__btn" href="https://wa.me/34946066039" target="_blank" rel="noopener">Abrir WhatsApp</a>
+    </div>
+  </div>
+  <script>
+  (function(){
+    const colors = ['#FF6EC7','#FFD86B','#7BE495','#7BDFF6','#9D7BFF','#FF9A9E'];
+    const container = document.querySelector('.personaliza-bolsa');
+    if(!container) return;
+
+    const particles = [];
+    let animId = null;
+
+    function createParticle(x,y){
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      const size = 6 + Math.random()*12;
+      el.style.width = size + 'px';
+      el.style.height = (size*1.2) + 'px';
+      el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.opacity = '1';
+      el.style.transform = 'translate(-50%,-50%) rotate(' + (Math.random()*360) + 'deg)';
+      container.appendChild(el);
+
+      const angle = Math.random() * Math.PI * 2; // full circle
+      const speed = 200 + Math.random()*400; // px per second
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      const rotation = Math.random()*360;
+      const rotationSpeed = (Math.random()*600 - 300); // deg/sec
+      const life = 1200 + Math.random()*900; // ms
+
+      const p = { el, x:0, y:0, vx, vy, rotation, rotationSpeed, birth: performance.now(), life };
+      particles.push(p);
+      if(!animId) animate();
+    }
+
+    function spawnBurst(){
+      const rect = container.getBoundingClientRect();
+      const cx = Math.round(container.clientWidth/2);
+      const cy = Math.round(container.clientHeight/2);
+      const count = 80;
+      for(let i=0;i<count;i++) createParticle(cx, cy);
+    }
+
+    function animate(){
+      const now = performance.now();
+      const gravity = 900; // px/s^2
+      let i = particles.length;
+      while(i--){
+        const p = particles[i];
+        const t = (now - p.birth)/1000; // seconds
+        if(t*1000 > p.life){
+          p.el.remove();
+          particles.splice(i,1);
+          continue;
+        }
+        const dt = 1/60;
+        // simple physics integration
+        p.vy = p.vy + gravity * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.rotation += p.rotationSpeed * dt;
+        const progress = t*1000 / p.life;
+        const alpha = Math.max(0, 1 - progress);
+        p.el.style.transform = `translate(calc(${p.x}px - 50%), calc(${p.y}px - 50%)) rotate(${p.rotation}deg)`;
+        p.el.style.opacity = alpha;
+      }
+      if(particles.length>0) animId = requestAnimationFrame(animate); else animId = null;
+    }
+
+    let last = 0;
+    container.addEventListener('mouseenter', ()=>{
+      const now = Date.now();
+      if(now - last < 300) return;
+      last = now;
+      spawnBurst();
+    });
+
+    // also allow click to trigger
+    container.addEventListener('click', ()=> spawnBurst());
+  })();
+  </script>
+  <script>
+  (function(){
+    const openBtn = document.getElementById('btn-ver-reglas');
+    const modal = document.getElementById('modal-reglas');
+    const closeBtn = document.getElementById('modal-close');
+    if(!openBtn || !modal) return;
+
+    function openModal(){
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      // trap focus could be added here
+    }
+    function closeModal(){
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+    }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn && closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+  })();
+  </script>
 </body>
 </html>

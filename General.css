@@ -34,3 +34,32 @@ body {
       color: #ff66c4;
       font-weight: bold;
     }
+
+/* Sticky contact widget shared across pages (except Config.html) */
+.sticky-contact{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background: rgba(255,255,255,0.96);
+  padding:8px 12px;
+  border-radius:28px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  z-index:9999;
+  backdrop-filter: blur(4px);
+}
+.sticky-contact__img{ width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+.sticky-contact__content{ display:flex; align-items:center; gap:10px; }
+.sticky-contact__info{ display:flex; flex-direction:column; line-height:1; }
+.sticky-contact__name{ font-weight:800; color:#ff3fa8; font-size:0.95rem; }
+.sticky-contact__subtitle{ font-size:0.78rem; color:#666; font-weight:600; }
+.sticky-contact__btn{ background:#ff66c4; color:#fff; text-decoration:none; padding:6px 10px; border-radius:18px; font-weight:700; font-size:0.9rem; box-shadow: 0 4px 8px rgba(255,102,196,0.18); }
+.sticky-contact__btn:focus,.sticky-contact__btn:hover{ filter:brightness(0.96); }
+
+@media (max-width:480px){
+  .sticky-contact{ left:12px; right:12px; justify-content:space-between; }
+  .sticky-contact__name{ display:none; }
+  .sticky-contact__subtitle{ display:none; }
+}

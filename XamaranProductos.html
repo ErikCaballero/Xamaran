@@ -85,10 +85,16 @@
             let intervalId = null;
 
             p.addEventListener('mouseenter', function(){
-              // play bite sound once on hover
+              // play sound once on hover (use LamerHelados for menuhelados)
               try {
-                biteSound.currentTime = 0;
-                const playPromise = biteSound.play();
+                if (!p._hoverAudio) {
+                  const src = (p.id === 'menuhelados') ? 'sonidos/LamerHelado.mp3' : 'sonidos/Mordisco.mp3';
+                  p._hoverAudio = new Audio(src);
+                  p._hoverAudio.preload = 'auto';
+                  p._hoverAudio.volume = 0.9;
+                }
+                p._hoverAudio.currentTime = 0;
+                const playPromise = p._hoverAudio.play();
                 if (playPromise !== undefined) playPromise.catch(function(){});
               } catch(e){}
 
@@ -188,5 +194,15 @@
       });
     });
   </script>
+  <div class="sticky-contact" aria-label="Enlace rápido Xamaran">
+    <img class="sticky-contact__img" src="img/XamaranLogo.png" alt="Logo Xamaran">
+    <div class="sticky-contact__content">
+      <div class="sticky-contact__info">
+        <span class="sticky-contact__name">Xamaran</span>
+        <span class="sticky-contact__subtitle">¿Necesitas ayuda?</span>
+      </div>
+      <a class="sticky-contact__btn" href="https://wa.me/34946066039" target="_blank" rel="noopener">Abrir WhatsApp</a>
+    </div>
+  </div>
 </body>
 </html>
