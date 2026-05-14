@@ -20,37 +20,65 @@
   </nav>
 
   <div class="section-block">
-    <h2>Productos</h2>
+    <h2>Categorías de Productos</h2>
     <section class="grid">
       <div class="paquete" id="menupatatas">
       <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png" alt="Paquete de snack">
+      <span class="paquete-label">Snacks</span>
     </div>
       <div class="paquete" id="menuchocolate">
       <img class="imagenchocolate" src="img/chocolate1.png" alt="Chocolate lleno">
       <img class="imagenchocolate" src="img/chocolate2.png" alt="Chocolate mordido">
       <img class="imagenchocolate" src="img/chocolate3.png" alt="Chcolate medio comido">
+      <span class="paquete-label">Chocolates</span>
     </div>
     <div class="paquete" id="menuchuches">
         <img class="r1" src="img/chuche1.png" alt="Chocolate lleno">
         <img class="r2" src="img/chuche2.png" alt="Chocolate mordido">
         <img class="r3" src="img/chuche3.png" alt="Chcolate medio comido">
+        <span class="paquete-label">Chuches</span>
     </div>
     <div class="paquete" id="menuhelados">
       <img class="imagenhelado" src="img/helado1.png" alt="Helado entero">
       <img class="imagenhelado" src="img/helado2.png" alt="Helado un poco derretido">
       <img class="imagenhelado" src="img/helado3.png" alt="Helado muy derretido">
       <img class="imagenhelado" src="img/helado4.png" alt="Helado super derretido">
+      <span class="paquete-label">Helados</span>
     </div>
     <div class="paquete" id="menulata">
       <img class="imagenlata" src="img/latacocacola1.png" alt="Lata de cocalola cerrada">
       <img class="imagenlata" src="img/latacocacola2.png" alt="Lata de cocalola abierta">
+      <span class="paquete-label">Bebidas</span>
+    </div>
+    <div class="paquete" id="menufrutossecos">
+      <img class="imagenfrutoseco1" src="img/cacahuete.png" alt="Cacahuete">
+      <img class="imagenfrutoseco2" src="img/almendra.png" alt="Almendra">
+      <img class="imagenfrutoseco3" src="img/pistacho.png" alt="Pistacho">
+      <img class="imagenfrutoseco4" src="img/pipa.png" alt="Pipas">
+      <span class="paquete-label">Frutos Secos</span>
+    </div>
+    <div class="paquete" id="menugalletas">
+      <img class="imagengalleta" src="img/galleta.png" alt="Galleta">
+      <span class="paquete-label">Galletas</span>
+    </div>
+    <div class="paquete" id="menualcohol">
+      <img class="imagenlata" src="img/latacocacola1.png" alt="Lata de cocalola cerrada">
+      <img class="imagenlata" src="img/latacocacola2.png" alt="Lata de cocalola abierta">
+      <span class="paquete-label">Bebidas Alcoholicas</span>
     </div>
     </section>
+    <div class="paquete" id="menuotros">
+      <img class="imagenlata" src="img/latacocacola1.png" alt="Lata de cocalola cerrada">
+      <img class="imagenlata" src="img/latacocacola2.png" alt="Lata de cocalola abierta">
+      <span class="paquete-label">Varios</span>
+    </div>
+    
   </div>
 
   <div class="section-block">
     <h2>Productos</h2>
-    <section class="grid">
+    <section class="grid" id="contenedor-productos">
+      <!-- Aquí se insertarán los productos desde JavaScript -->
       
     </section>
   </div>
@@ -59,8 +87,7 @@
   <footer>
     <h3>Contacto</h3>
     <p>Dirección: Errekatxu Kalea, 6, Bajo-Izquierda, 48100 Mungia, Biscay</p>
-    <p>Horario: 17:00 - 21:30</p>
-    <p>Txutxe Denda - Xamarian © 2025</p>
+    <p>Txutxe Denda - Xamarian ©</p>
   </footer>
   <script>
     document.addEventListener('DOMContentLoaded', function(){
@@ -194,6 +221,88 @@
       });
     });
   </script>
+  <script>
+    // Animación de galleta: exit -> enter -> restore
+    (function(){
+      const paquete = document.getElementById('menugalletas');
+      if(!paquete) return;
+      const g = paquete.querySelector('.imagengalleta');
+      if(!g) return;
+
+      let running = false;
+
+      paquete.addEventListener('mouseenter', function(){
+        if(running) return;
+        running = true;
+        // iniciar salida hacia la derecha
+        g.style.animation = 'galletaExit 700ms cubic-bezier(.22,.9,.1,1) forwards';
+      });
+
+      g.addEventListener('animationend', function(e){
+        if(e.animationName === 'galletaExit'){
+          // situar fuera a la izquierda inmediatamente (sin transición)
+          g.style.animation = '';
+          g.style.left = '-40%';
+          // forzar reflow para que el siguiente animation empiece limpio
+          void g.offsetWidth;
+          // iniciar entrada desde la izquierda hasta centro
+          g.style.animation = 'galletaEnter 700ms cubic-bezier(.22,.9,.1,1) forwards';
+        } else if(e.animationName === 'galletaEnter'){
+          // animación completa: limpiar y restaurar estilo final
+          g.style.animation = '';
+          g.style.left = '50%';
+          g.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+          running = false;
+        }
+      });
+    })();
+  </script>
+  <script>
+    // Frutos secos: apilar imágenes, subir en hover y bajar con caída independiente
+    (function(){
+      const cont = document.getElementById('menufrutossecos');
+      if(!cont) return;
+      const imgs = Array.from(cont.querySelectorAll('img'));
+
+      let fallingTimeout = null;
+
+      cont.addEventListener('mouseenter', ()=>{
+        // stop any in-progress fall and make all images lift (using CSS vars defined in Productos.css)
+        cont.classList.remove('fall');
+        if(fallingTimeout){ clearTimeout(fallingTimeout); fallingTimeout = null }
+        imgs.forEach(i=> i.style.animationDelay = '');
+        cont.classList.add('lift');
+      });
+
+      cont.addEventListener('mouseleave', ()=>{
+        // keep the 'lift' state while we prepare the staggered fall
+        imgs.forEach((img, idx)=>{
+          // stagger delays so they fall independently
+          const delay = (idx * 100) + Math.floor(Math.random()*120);
+          img.style.animationDelay = delay + 'ms';
+        });
+
+        // small timeout to ensure delays are applied then trigger the fall animation
+        fallingTimeout = setTimeout(()=>{
+          cont.classList.add('fall');
+          // when all animations finish, cleanup classes and inline delays
+          let finished = 0;
+          imgs.forEach((img)=>{
+            const handler = function(){
+              finished++;
+              img.removeEventListener('animationend', handler);
+              img.style.animationDelay = '';
+              if(finished === imgs.length){
+                cont.classList.remove('fall');
+                cont.classList.remove('lift');
+              }
+            };
+            img.addEventListener('animationend', handler);
+          });
+        }, 30);
+      });
+    })();
+  </script>
   <div class="sticky-contact" aria-label="Enlace rápido Xamaran">
     <img class="sticky-contact__img" src="img/XamaranLogo.png" alt="Logo Xamaran">
     <div class="sticky-contact__content">
@@ -204,5 +313,93 @@
       <a class="sticky-contact__btn" href="https://wa.me/34946066039" target="_blank" rel="noopener">Abrir WhatsApp</a>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  const { createClient } = supabase;
+  const supabaseUrl = 'https://gcaknxodxvoshqibskfo.supabase.co'; 
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8'; 
+  const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+  let todosLosProductos = [];
+
+  const mapaCategorias = {
+    'menupatatas': 'Snacks',
+    'menuchocolate': 'Chocolates',
+    'menuchuches': 'Chuches',
+    'menuhelados': 'Helados',
+    'menulata': 'Bebidas',
+    'menufrutossecos': 'Frutos Secos',
+    'menugalletas': 'Galletas',
+    'menualcohol': 'Bebidas Alcoholicas',
+    'menuotros': 'Varios'
+  };
+
+  document.addEventListener('DOMContentLoaded', async function() {
+    // CAMBIO 1: Selector por ID (mucho más seguro)
+    const contenedorProductos = document.getElementById('contenedor-productos');
+
+    function renderizarProductos(productosParaMostrar) {
+      if (!contenedorProductos) return;
+      contenedorProductos.innerHTML = ''; 
+
+      if(productosParaMostrar.length === 0) {
+        contenedorProductos.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">No hay productos en esta categoría.</p>';
+        return;
+      }
+
+      productosParaMostrar.forEach(producto => {
+        // CAMBIO 2: Usar 'Descripcion' con D mayúscula según tu imagen de la tabla
+        const desc = producto.Descripcion ? producto.Descripcion : ""; 
+
+        const card = document.createElement('div');
+        card.className = 'producto-card';
+        card.innerHTML = `
+          <img src="${producto.imagen || 'img/placeholder.png'}" alt="${producto.nombre}" style="width:100%; max-height: 200px; object-fit: contain;">
+          <h3>${producto.nombre}</h3>
+          <p class="descripcion">${desc}</p>
+          <p class="precio"><strong>${producto.precio} €</strong></p>
+        `;
+        contenedorProductos.appendChild(card);
+      });
+    }
+
+    async function cargarProductos() {
+      // CAMBIO 3: Aseguramos que los nombres de columnas coinciden con Supabase
+      const { data, error } = await supabaseClient
+        .from('productos')
+        .select('nombre, precio, categoria, Descripcion, imagen').order('nombre', { ascending: true }); 
+
+      if (error) {
+        console.error('Error al cargar productos:', error.message);
+        return;
+      }
+
+      todosLosProductos = data;
+      console.log("Productos cargados exitosamente:", todosLosProductos.length);
+      
+      // ESTO ES LO QUE HACE QUE SE CARGUEN POR DEFECTO
+      renderizarProductos(todosLosProductos); 
+    }
+
+    // Configuración de clics para filtrar
+    const paquetesCategoria = document.querySelectorAll('.paquete');
+    paquetesCategoria.forEach(paquete => {
+      paquete.addEventListener('click', () => {
+        const nombreCategoriaDB = mapaCategorias[paquete.id];
+        if (nombreCategoriaDB) {
+          const filtrados = todosLosProductos.filter(prod => 
+            prod.categoria && prod.categoria.trim() === nombreCategoriaDB
+          );
+          renderizarProductos(filtrados);
+          // Opcional: Hacer scroll hasta la galería al clicar
+          contenedorProductos.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // EJECUCIÓN INICIAL
+    cargarProductos();
+  });
+</script>
 </body>
 </html>

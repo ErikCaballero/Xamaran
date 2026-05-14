@@ -53,17 +53,18 @@
   .paquete{
     display: block;
     position: relative;
-    width: 200px;
+    width: 220px;
+    height: 240px;
     max-width: calc(100% - 40px);
-    aspect-ratio: 1 / 1; /* keep perfect circle */
     margin: 0 auto 20px auto;
     text-align: center;
-    border-radius: 50%;
-    overflow: hidden; /* clip image to the circle */
-    background: radial-gradient(circle at 30% 30%, #b16aff 0%, #8a2be2 45%, #6a00cc 100%);
-    box-shadow: 0 8px 20px rgba(106,0,204,0.12);
-    transition: transform .25s ease, box-shadow .25s ease;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg,#8a2be2 0%, #b16aff 50%, #ffd6f5 100%);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: transform .22s cubic-bezier(.2,.9,.3,1), box-shadow .22s ease;
     justify-self: center; /* center within grid cell */
+    padding: 12px;
   }
 
   .imagenpaquete{
@@ -74,6 +75,26 @@
     position: relative;
     will-change: transform;
     transition: transform .25s ease;
+  }
+
+  /* Label overlay for clear text (e.g., 'Snack') */
+  .paquete-label{
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    display: inline-block;
+    padding: 8px 12px;
+    background: rgba(18,18,18,0.72);
+    color: #fff;
+    font-weight:800;
+    font-size: 1rem;
+    text-align:center;
+    border-radius:10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    pointer-events:none;
   }
 
   /* Uniform size for chocolate images */
@@ -116,8 +137,8 @@
   
 
   .paquete:hover{
-    transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 18px 36px rgba(106,0,204,0.18);
+    transform: translateY(-10px) scale(1.04);
+    box-shadow: 0 26px 48px rgba(0,0,0,0.22);
   }
 
   /* play shake once per hover to avoid continuous movement */
@@ -198,3 +219,126 @@
       border-radius: 12px;
       bottom: -12;
     }
+
+/* Frutos secos: imágenes apiladas, suben al pasar y bajan de forma independiente
+   Nota: NO se cambia el tamaño del contenedor `.paquete` (se respeta el layout). */
+#menufrutossecos img {
+  position: absolute;
+  left: 50%;
+  bottom: 34px;
+  /* variables por imagen: --lx (offset X) y --ly (offset Y para lift, por defecto 0) */
+  --lx: 0px;
+  --ly: 0;
+  transform: translateX(calc(-50% + var(--lx))) translateY(var(--ly));
+  width: 80px;
+  height: auto;
+  transition: transform 300ms ease;
+  will-change: transform;
+}
+
+/* Al aplicar .lift, las imágenes se posicionan hacia arriba usando variables específicas por imagen */
+#menufrutossecos.lift img { /* base: todas suben */
+  --ly: -100%;
+}
+/* direcciones fijas por imagen: 1 izquierda-arriba, 2 derecha-arriba, 3 arriba, 4 arriba */
+#menufrutossecos.lift img.imagenfrutoseco1 { --lx: -40px; }
+#menufrutossecos.lift img.imagenfrutoseco2 { --lx:  40px; }
+#menufrutossecos.lift img.imagenfrutoseco3 { --lx:   0px; }
+#menufrutossecos.lift img.imagenfrutoseco4 { --lx:   0px; }
+
+/* Al aplicar .fall, reproducimos una animación que va de la posición "lift" a la base (bottom)
+   La animación usa las mismas variables --lx/--ly para mantener la posición X durante la caída. */
+#menufrutossecos.fall img {
+  animation-name: frutoscaida;
+  animation-duration: 700ms;
+  animation-timing-function: cubic-bezier(.2,.8,.2,1);
+  animation-fill-mode: forwards;
+}
+@keyframes frutoscaida {
+  from { transform: translateX(calc(-50% + var(--lx))) translateY(var(--ly)); }
+  to   { transform: translateX(calc(-50% + var(--lx))) translateY(0); }
+}
+
+/* pequeños ajustes responsivos */
+@media (max-width:480px){
+  #menufrutossecos img { width: 64px }
+}
+
+/* Galleta: aparece desde la izquierda, gira mientras cruza hacia la derecha del div */
+#menugalletas { /* .paquete ya es relative; overflow clipped por defecto */ }
+#menugalletas .imagengalleta{
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  width: 340px;
+  height: auto;
+  z-index: 6;
+  will-change: transform, left;
+}
+
+#menuotros{
+  width: 100%;
+}
+/* El movimiento se controla por JS: primero 'galletaExit' (sale hacia la derecha girando),
+   luego 'galletaEnter' (aparece por la izquierda y vuelve al centro). */
+@keyframes galletaExit {
+  0% {
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    left: 140%;
+    transform: translate(-50%, -50%) rotate(720deg);
+  }
+}
+@keyframes galletaEnter {
+  0% {
+    left: -40%;
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+
+.producto-card {
+  border: 2px dashed #ff66c4; 
+  padding: 10px; 
+  margin: 10px; 
+  border-radius: 8px; 
+  display: inline-block; 
+  width: 200px; 
+  text-align: center; 
+  background-color: white; 
+  vertical-align: top;
+}
+
+.producto-card img {
+  width:100px; 
+  height: 100px; 
+  object-fit: cover; 
+  border-radius: 4px;
+}
+
+.producto-card h3 {
+  color: #ff66c4; 
+  margin: 10px 0;
+}
+
+.producto-card .precio {
+  color: purple; 
+  font-size: 18px;
+}
+
+.producto-card .descripcion {
+  font-size: 12px; 
+  color: grey; 
+  margin-top: 5px;
+}
+.producto-card:hover {
+  transform: scale(1.05); 
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+}

@@ -169,5 +169,18 @@
     .entregas img{
       border-radius: 15px;
       margin: 20px 0;
-      height: 400px;
+      max-width: 100%;
+      height: auto;
+      display:block;
+    }
+
+    /* Responsive layout: en pantallas grandes mostrar en fila */
+    
+
+    /* Ajustes para móviles pequeños */
+    @media (max-width:480px){
+      .entregas{ padding:16px; gap:12px }
+      .entregas h3{ font-size:1.4rem }
+      .entregas .entregas-content{ font-size:1rem }
+      .btn-ver-reglas{ width:100%; padding:12px; border-radius:12px }
     }
