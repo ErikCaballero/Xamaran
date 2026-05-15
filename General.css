@@ -10,6 +10,9 @@ body {
       padding: 20px;
       text-align: center;
       border-bottom: 6px solid #ff66c4;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
     header h1 {
@@ -26,6 +29,9 @@ body {
       gap: 30px;
       padding: 15px;
       border-bottom: 4px dashed #ff66c4;
+      position: sticky;
+      top: 92px;
+      z-index: 999;
     }
 
     nav a {
@@ -33,6 +39,11 @@ body {
       font-size: 1.2rem;
       color: #ff66c4;
       font-weight: bold;
+    }
+    footer a {
+      text-decoration: none;
+      font-weight: bold;
+      
     }
 
 /* Sticky contact widget shared across pages (except Config.html) */
@@ -59,7 +70,9 @@ body {
 .sticky-contact__btn:focus,.sticky-contact__btn:hover{ filter:brightness(0.96); }
 
 @media (max-width:480px){
-  .sticky-contact{ left:12px; right:12px; justify-content:space-between; }
-  .sticky-contact__name{ display:none; }
-  .sticky-contact__subtitle{ display:none; }
+  .sticky-contact{ left:12px; right:12px; justify-content:space-between; padding:8px 10px; gap:8px; }
+  .sticky-contact__name{ display:block; font-size:0.55rem; color:#ff3fa8; font-weight:800 }
+  .sticky-contact__subtitle{ display:block; font-size:0.72rem; color:#666; font-weight:600 }
+  .sticky-contact__img{ width:34px; height:34px }
+  .sticky-contact__btn{ padding:6px 8px; font-size:0.85rem }
 }

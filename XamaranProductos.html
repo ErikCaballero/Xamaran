@@ -7,12 +7,29 @@
   <link rel="shortcut icon" href="img/XamaranLogo.png" type="image/x-icon">
   <link rel="stylesheet" href="General.css">
   <link rel="stylesheet" href="Productos.css">
+  <script src="carrito.js"></script>
 </head>
 <body>
   <header>
     <h1>Productos - Xamaran</h1>
+    <div class="carrito-header" id="abrir-carrito">
+      <img src="img/Carrito.png" alt="Carrito" class="carrito-icono">
+      <div class="carrito-info">
+        <span id="carrito-cantidad">0 productos</span>
+        <span id="carrito-total">0.00 €</span>
+      </div>
+    </div>
   </header>
-
+  <div id="carrito-modal" class="modal-carrito">
+  <div class="modal-contenido">
+    <span class="cerrar-modal">&times;</span>
+    <h2>Tu Selección</h2>
+    <ul id="lista-carrito">
+      </ul>
+    <hr>
+    <p><strong>Total: <span id="modal-total">0.00 €</span></strong></p>
+  </div>
+</div>
   <nav>
     <a href="index.html">Inicio</a>
     <a href="XamaranProductos.html">Productos</a>
@@ -77,6 +94,11 @@
 
   <div class="section-block">
     <h2>Productos</h2>
+
+    <div class="buscador-container">
+      <input type="text" id="buscador-nombre" placeholder="🔍 Buscar producto por nombre..." />
+    </div>
+
     <section class="grid" id="contenedor-productos">
       <!-- Aquí se insertarán los productos desde JavaScript -->
       
@@ -314,42 +336,41 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-  const { createClient } = supabase;
-  const supabaseUrl = 'https://gcaknxodxvoshqibskfo.supabase.co'; 
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8'; 
-  const supabaseClient = createClient(supabaseUrl, supabaseKey);
+   <script>
+    const { createClient } = supabase;
+    const supabaseUrl = 'https://gcaknxodxvoshqibskfo.supabase.co'; 
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8'; 
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-  let todosLosProductos = [];
-
-  const mapaCategorias = {
-    'menupatatas': 'Snacks',
-    'menuchocolate': 'Chocolates',
-    'menuchuches': 'Chuches',
-    'menuhelados': 'Helados',
-    'menulata': 'Bebidas',
-    'menufrutossecos': 'Frutos Secos',
-    'menugalletas': 'Galletas',
-    'menualcohol': 'Bebidas Alcoholicas',
-    'menuotros': 'Varios'
-  };
-
-  document.addEventListener('DOMContentLoaded', async function() {
-    // CAMBIO 1: Selector por ID (mucho más seguro)
+    let todosLosProductos = [];
     const contenedorProductos = document.getElementById('contenedor-productos');
+    const inputBuscador = document.getElementById('buscador-nombre');
+
+    const mapaCategorias = {
+      'menupatatas': 'Snacks',
+      'menuchocolate': 'Chocolates',
+      'menuchuches': 'Chuches',
+      'menuhelados': 'Helados',
+      'menulata': 'Bebidas',
+      'menufrutossecos': 'Frutos Secos',
+      'menugalletas': 'Galletas',
+      'menualcohol': 'Bebidas Alcoholicas',
+      'menuotros': 'Varios'
+    };
 
     function renderizarProductos(productosParaMostrar) {
       if (!contenedorProductos) return;
       contenedorProductos.innerHTML = ''; 
 
       if(productosParaMostrar.length === 0) {
-        contenedorProductos.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">No hay productos en esta categoría.</p>';
+        contenedorProductos.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">No se encontraron productos.</p>';
         return;
       }
 
       productosParaMostrar.forEach(producto => {
-        // CAMBIO 2: Usar 'Descripcion' con D mayúscula según tu imagen de la tabla
-        const desc = producto.Descripcion ? producto.Descripcion : ""; 
+        const desc = producto.Descripcion || ""; 
+        // CAMBIO: Number().toFixed(2) para los decimales
+        const precioFormateado = Number(producto.precio).toFixed(2);
 
         const card = document.createElement('div');
         card.className = 'producto-card';
@@ -357,49 +378,55 @@
           <img src="${producto.imagen || 'img/placeholder.png'}" alt="${producto.nombre}" style="width:100%; max-height: 200px; object-fit: contain;">
           <h3>${producto.nombre}</h3>
           <p class="descripcion">${desc}</p>
-          <p class="precio"><strong>${producto.precio} €</strong></p>
+          <p class="precio"><strong>${precioFormateado} €</strong></p>
+          <button class="btn-seleccionar" onclick="añadirAlCarrito('${producto.nombre}', ${producto.precio})">
+            Seleccionar
+          </button>
         `;
         contenedorProductos.appendChild(card);
       });
     }
 
     async function cargarProductos() {
-      // CAMBIO 3: Aseguramos que los nombres de columnas coinciden con Supabase
       const { data, error } = await supabaseClient
         .from('productos')
-        .select('nombre, precio, categoria, Descripcion, imagen').order('nombre', { ascending: true }); 
+        .select('nombre, precio, categoria, Descripcion, imagen')
+        .order('nombre', { ascending: true }); 
 
       if (error) {
-        console.error('Error al cargar productos:', error.message);
+        console.error('Error:', error.message);
         return;
       }
 
       todosLosProductos = data;
-      console.log("Productos cargados exitosamente:", todosLosProductos.length);
-      
-      // ESTO ES LO QUE HACE QUE SE CARGUEN POR DEFECTO
       renderizarProductos(todosLosProductos); 
     }
 
-    // Configuración de clics para filtrar
-    const paquetesCategoria = document.querySelectorAll('.paquete');
-    paquetesCategoria.forEach(paquete => {
+    // EVENTO: Búsqueda por nombre
+    inputBuscador.addEventListener('input', (e) => {
+      const texto = e.target.value.toLowerCase();
+      const filtrados = todosLosProductos.filter(prod => 
+        prod.nombre.toLowerCase().includes(texto)
+      );
+      renderizarProductos(filtrados);
+    });
+
+    // EVENTO: Filtrado por categorías (clic en iconos)
+    document.querySelectorAll('.paquete').forEach(paquete => {
       paquete.addEventListener('click', () => {
         const nombreCategoriaDB = mapaCategorias[paquete.id];
         if (nombreCategoriaDB) {
+          inputBuscador.value = ""; // Limpiamos buscador al elegir categoría
           const filtrados = todosLosProductos.filter(prod => 
             prod.categoria && prod.categoria.trim() === nombreCategoriaDB
           );
           renderizarProductos(filtrados);
-          // Opcional: Hacer scroll hasta la galería al clicar
           contenedorProductos.scrollIntoView({ behavior: 'smooth' });
         }
       });
     });
 
-    // EJECUCIÓN INICIAL
-    cargarProductos();
-  });
-</script>
+    document.addEventListener('DOMContentLoaded', cargarProductos);
+  </script>
 </body>
 </html>

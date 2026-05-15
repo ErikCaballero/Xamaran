@@ -3,193 +3,250 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Configuración - Horarios e Imágenes</title>
+    <title>Configuración - Xamaran</title>
     <style>
-        body { font-family: sans-serif; background-color: #f0f2f5; padding: 20px; }
-        .schedule-form, .image-form { max-width:700px; margin:20px auto; padding:16px; background:#fff; border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,.1); }
-        .day-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
-        .day-row label { width:100px; font-weight: bold; }
-        .day-row input[type="time"] { flex:1; padding: 4px; }
-        .actions { text-align:right; margin-top:12px; }
-        .preview { max-width:700px; margin:12px auto; padding:12px; background:#f9f9f9; border-radius:6px; border: 1px solid #ddd; }
-        button { cursor: pointer; padding: 8px 16px; border-radius: 4px; border: none; font-weight: bold; }
-        button[type="submit"], .btn-primary { background: #007bff; color: white; }
-        #resetBtn { background: #dc3545; color: white; }
+        /* Estilos Base */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; margin: 0; }
+        h1, h2 { color: #2c3e50; text-align: center; }
+
+        .schedule-form, .product-form, .preview {
+            max-width: 700px; 
+            margin: 20px auto; 
+            padding: 25px;
+            background: #fff; 
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .day-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+        .day-row label { width: 110px; font-weight: 600; color: #444; }
+        .day-row input[type="time"] { flex: 1; padding: 8px; border: 1px solid #ccd1d9; border-radius: 6px; }
+
+        .product-form label { display: block; margin-top: 15px; font-weight: 600; font-size: 0.95em; }
+        .product-form input, .product-form select, .product-form textarea {
+            width: 100%; padding: 12px; margin-top: 6px;
+            box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px;
+            font-size: 14px;
+        }
         
-        /* Estilos nuevos para imagen */
-        .image-manager { display: flex; flex-direction: column; gap: 10px; }
-        #imgUrlDisplay { font-size: 0.85em; word-break: break-all; color: #555; background: #eee; padding: 5px; border-radius: 4px; margin-top: 10px; }
-        #imgPreview { max-width: 150px; margin-top: 10px; border-radius: 4px; display: none; }
+        .small-row { display: flex; gap: 15px; align-items: flex-end; margin-top: 10px; }
+        .col { flex: 1; }
+
+        button {
+            cursor: pointer; padding: 12px 20px; border-radius: 6px;
+            border: none; font-weight: bold; transition: all 0.2s ease;
+        }
+        button[type="submit"], .btn-primary { background: #6f42c1; color: white; }
+        button[type="submit"]:hover, .btn-primary:hover { background: #5a32a3; transform: translateY(-1px); }
+        #resetBtn { background: #dc3545; color: white; margin-left: 10px; }
+
+        .msg { padding: 15px; border-radius: 6px; margin-top: 20px; display: none; font-size: 0.9em; }
+        .msg.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .msg.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        #imgPreview { max-width: 180px; margin-top: 15px; border-radius: 8px; display: none; border: 2px solid #eee; }
+        #prodImgUrlDisplay { 
+            font-size: 0.8em; word-break: break-all; color: #666; 
+            background: #f8f9fa; padding: 8px; border-radius: 6px; 
+            margin-top: 12px; border: 1px solid #eee; 
+        }
     </style>
 </head>
 <body>
-    <main>
-        <h1>Configuración</h1>
-        
-        <section class="schedule-form" aria-labelledby="horarios-title">
-            <h2 id="horarios-title">Editar Horarios</h2>
-            <form id="horariosForm">
-                <div id="daysContainer"></div>
-                <div class="actions">
-                    <button type="submit">Guardar horarios</button>
-                    <button type="button" id="resetBtn">Restablecer</button>
+
+    <h1>Panel de Configuración Xamaran</h1>
+
+    <section class="product-form">
+        <h2>Añadir Nuevo Producto</h2>
+        <form id="productoForm">
+            <label for="prodNombre">Nombre del producto *</label>
+            <input type="text" id="prodNombre" placeholder="Ej: Jumpers de Queso" required>
+
+            <div class="small-row">
+                <div class="col">
+                    <label for="prodPrecio">Precio (€) *</label>
+                    <input type="number" id="prodPrecio" step="0.01" min="0" required>
                 </div>
-            </form>
-        </section>
-
-        <section class="image-form">
-            <h2>Logo / Imagen de la Web</h2>
-            <div class="image-manager">
-                <input type="file" id="archivoInput" accept="image/*">
-                <button type="button" id="btnSubirImagen" class="btn-primary">Subir Imagen a la Nube</button>
-                <div id="uploadStatus"></div>
-                <img id="imgPreview" src="" alt="Vista previa">
-                <div id="imgUrlDisplay">La URL de la imagen aparecerá aquí al subirla.</div>
+                <div class="col">
+                    <label for="prodCategoria">Categoría *</label>
+                    <select id="prodCategoria" required></select>
+                </div>
             </div>
-        </section>
 
-        <section class="preview" aria-live="polite">
-            <h3>Horario actual (Vista Previa)</h3>
-            <div id="horariosPreview">Cargando datos desde la nube...</div>
-        </section>
-    </main>
+            <label for="newCategoria">¿Falta una categoría?</label>
+            <div class="small-row">
+                <input type="text" id="newCategoria" placeholder="Nombre de categoría..." class="col">
+                <button type="button" id="btnAddCategoria" style="background: #28a745; color: white;">Añadir</button>
+            </div>
+
+            <label for="prodDesc">Descripción (Opcional)</label>
+            <textarea id="prodDesc" rows="2" placeholder="Ej: Snacks horneados..."></textarea>
+
+            <label for="prodMarca">Marca (Opcional)</label>
+            <input type="text" id="prodMarca" placeholder="Ej: Grefusa">
+
+            <label>Imagen del producto (Opcional)</label>
+            <input type="file" id="prodImagen" accept="image/*">
+            <div class="small-row">
+                <button type="button" id="btnUploadProdImg" class="btn-primary">1. Subir Imagen</button>
+            </div>
+            
+            <div id="prodImgUrlDisplay">La URL aparecerá aquí si subes una imagen.</div>
+            <img id="imgPreview" src="" alt="Vista previa">
+            <input type="hidden" id="prodImagenUrl">
+
+            <div style="margin-top: 30px;">
+                <button type="submit" style="width: 100%; font-size: 1.1em; padding: 15px;">2. Guardar Producto en Base de Datos</button>
+            </div>
+
+            <div id="productoMsg" class="msg"></div>
+        </form>
+    </section>
+
+    <section class="schedule-form">
+        <h2>Editar Horarios</h2>
+        <form id="horariosForm">
+            <div id="daysContainer"></div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button type="submit">Guardar horarios</button>
+                <button type="button" id="resetBtn">Limpiar</button>
+            </div>
+        </form>
+    </section>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // 1. CONFIGURACIÓN
-        const SUPABASE_URL = 'https://cbtvetmvxvxhidsgpcoh.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNidHZldG12eHZ4aGlkc2dwY29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MzM4NzMsImV4cCI6MjA4NzQwOTg3M30.kphDJaqTCBzHuDSraol0gaDOTMfYf7eHNHaQGy3Ab7o';
-        
+        const SUPABASE_URL = 'https://gcaknxodxvoshqibskfo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8';
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let categoriasBase = ['Snacks', 'Chocolates', 'Chuches', 'Bebidas', 'Helados', 'Frutos Secos', 'Galletas', 'Varios'];
+        const selectCat = document.getElementById('prodCategoria');
+
+        function cargarCategorias() {
+            selectCat.innerHTML = '<option value="" disabled selected>Selecciona una categoría...</option>';
+            categoriasBase.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                selectCat.appendChild(opt);
+            });
+        }
+
+        document.getElementById('btnAddCategoria').addEventListener('click', () => {
+            const nueva = document.getElementById('newCategoria').value.trim();
+            if(nueva && !categoriasBase.includes(nueva)) {
+                categoriasBase.push(nueva);
+                cargarCategorias();
+                selectCat.value = nueva;
+                document.getElementById('newCategoria').value = '';
+            }
+        });
+
+        const btnSubirImg = document.getElementById('btnUploadProdImg');
+        const fileInput = document.getElementById('prodImagen');
+        const urlDisplay = document.getElementById('prodImgUrlDisplay');
+        const imgPreview = document.getElementById('imgPreview');
+        const inputUrlOculto = document.getElementById('prodImagenUrl');
+
+        btnSubirImg.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            const categoria = selectCat.value;
+
+            if (!categoria) return alert("Selecciona primero una categoría para organizar la carpeta.");
+            if (!file) return alert("Selecciona un archivo de imagen.");
+
+            btnSubirImg.textContent = "Subiendo...";
+            btnSubirImg.disabled = true;
+            
+            const filePath = `${categoria}/${file.name}`; 
+
+            const { data, error } = await _supabase.storage
+                .from('productos')
+                .upload(filePath, file, { upsert: true });
+
+            if (error) {
+                urlDisplay.textContent = "Error: " + error.message;
+                btnSubirImg.textContent = "Reintentar";
+                btnSubirImg.disabled = false;
+            } else {
+                const { data: publicData } = _supabase.storage.from('productos').getPublicUrl(filePath);
+                // Guardar sólo el nombre original del archivo (antes de subirse)
+                inputUrlOculto.value = file.name;
+                urlDisplay.textContent = "URL: " + publicData.publicUrl;
+                imgPreview.src = publicData.publicUrl;
+                imgPreview.style.display = "block";
+                btnSubirImg.textContent = "¡Subida con éxito!";
+                btnSubirImg.style.background = "#28a745";
+                btnSubirImg.disabled = false;
+            }
+        });
+
+        const prodForm = document.getElementById('productoForm');
+        prodForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msg = document.getElementById('productoMsg');
+
+            const datos = {
+                nombre: document.getElementById('prodNombre').value,
+                precio: parseFloat(document.getElementById('prodPrecio').value),
+                categoria: selectCat.value,
+                Descripcion: document.getElementById('prodDesc').value,
+                marca: document.getElementById('prodMarca').value, // Nuevo campo
+                imagen: inputUrlOculto.value || null
+            };
+
+            const { error } = await _supabase.from('productos').insert([datos]);
+
+            if (error) {
+                mostrarMensaje(msg, "Error en BD: " + error.message, "error");
+            } else {
+                mostrarMensaje(msg, "¡Producto guardado correctamente!", "success");
+                resetearFormulario();
+            }
+        });
 
         const days = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
         const container = document.getElementById('daysContainer');
-        const preview = document.getElementById('horariosPreview');
 
-        // --- LÓGICA DE HORARIOS (SIN CAMBIOS) ---
-
-        async function loadHorarios() {
-            preview.textContent = 'Cargando horarios...';
-            let { data, error } = await _supabase.from('Horarios').select('*');
-            if (error) {
-                console.error("Error:", error);
-                preview.textContent = 'Error: ' + error.message;
-                return;
-            }
-            const initial = {};
-            data.forEach(item => {
-                if (item.hora && item.hora.includes(' - ')) {
-                    const partes = item.hora.split(' - ');
-                    initial[item.Dia] = { start: partes[0], end: partes[1] };
-                }
-            });
-            buildForm(initial);
-            renderPreview(initial);
-        }
-
-        async function saveHorarios(data) {
-            const rows = Object.keys(data).map(day => {
-                const start = data[day].start || '00:00';
-                const end = data[day].end || '00:00';
-                return { Dia: day, hora: `${start} - ${end}` };
-            });
-            const { error } = await _supabase.from('Horarios').upsert(rows, { onConflict: 'Dia' });
-            if (error) {
-                alert('Error al guardar: ' + error.message);
-            } else {
-                alert('¡Horarios actualizados en Supabase!');
-                loadHorarios();
-            }
-        }
-
-        function buildForm(initial = {}) {
+        function initHorarios() {
             container.innerHTML = '';
             days.forEach((day, i) => {
                 const row = document.createElement('div');
                 row.className = 'day-row';
-                row.innerHTML = `<label>${day}</label>
-                    <input type="time" id="start-${i}" value="${initial[day]?.start || ''}">
-                    <span>—</span>
-                    <input type="time" id="end-${i}" value="${initial[day]?.end || ''}">`;
+                row.innerHTML = `<label>${day}</label><input type="time" id="start-${i}"><span>-</span><input type="time" id="end-${i}">`;
                 container.appendChild(row);
             });
         }
 
-        function renderPreview(obj) {
-            if (!obj || Object.keys(obj).length === 0) {
-                preview.innerHTML = 'No hay horarios guardados.';
-                return;
-            }
-            const html = days.map(d => {
-                const entry = obj[d];
-                const texto = (entry && entry.start && entry.end) 
-                    ? `${entry.start} — ${entry.end}` : '<span style="color:red">Cerrado / No definido</span>';
-                return `<div><strong>${d}:</strong> ${texto}</div>`;
-            }).join('');
-            preview.innerHTML = html;
+        document.getElementById('horariosForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const rows = days.map((day, i) => ({
+                Dia: day,
+                hora: `${document.getElementById(`start-${i}`).value} - ${document.getElementById(`end-${i}`).value}`
+            }));
+            const { error } = await _supabase.from('Horarios').upsert(rows);
+            alert(error ? "Error: " + error.message : "Horarios actualizados");
+        });
+
+        function mostrarMensaje(el, texto, tipo) {
+            el.textContent = texto;
+            el.className = `msg ${tipo}`;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
         }
 
-        // --- LÓGICA DE IMAGEN (CORREGIDA PARA MANTENER NOMBRE ORIGINAL) ---
+        function resetearFormulario() {
+            prodForm.reset();
+            inputUrlOculto.value = '';
+            imgPreview.style.display = "none";
+            btnSubirImg.textContent = "1. Subir Imagen";
+            btnSubirImg.style.background = "#6f42c1";
+            urlDisplay.textContent = "La URL aparecerá aquí si subes una imagen.";
+        }
 
-        const btnSubir = document.getElementById('btnSubirImagen');
-        const fileInput = document.getElementById('archivoInput');
-        const statusText = document.getElementById('uploadStatus');
-        const urlDisplay = document.getElementById('imgUrlDisplay');
-        const imgPreview = document.getElementById('imgPreview');
-
-        btnSubir.addEventListener('click', async () => {
-            const file = fileInput.files[0];
-            if (!file) return alert("Por favor, selecciona una imagen primero.");
-
-            statusText.textContent = `Subiendo "${file.name}"...`;
-            
-            // Usamos directamente el nombre original del archivo seleccionado
-            const fileName = file.name; 
-
-            // Subir a Supabase Storage (Bucket 'MeSacoLaPollaEnDirecto')
-            const { data, error } = await _supabase.storage
-                .from('MeSacoLaPollaEnDirecto')
-                .upload(fileName, file, {
-                    upsert: true // Esto permite que si subes otra con el mismo nombre, se reemplace
-                });
-
-            if (error) {
-                statusText.textContent = "Error al subir: " + error.message;
-            } else {
-                // Obtener URL Pública
-                const { data: publicData } = _supabase.storage
-                    .from('MeSacoLaPollaEnDirecto')
-                    .getPublicUrl(fileName);
-
-                const finalUrl = publicData.publicUrl;
-                
-                statusText.textContent = "¡Imagen subida con éxito!";
-                urlDisplay.textContent = "URL: " + finalUrl;
-                imgPreview.src = finalUrl;
-                imgPreview.style.display = "block";
-            }
-        });
-
-        // EVENTOS HORARIOS
-        document.getElementById('horariosForm').addEventListener('submit', async e => {
-            e.preventDefault();
-            const data = {};
-            days.forEach((d, i) => {
-                const start = document.getElementById(`start-${i}`).value;
-                const end = document.getElementById(`end-${i}`).value;
-                if (start || end) data[d] = { start, end };
-            });
-            await saveHorarios(data);
-        });
-
-        document.getElementById('resetBtn').addEventListener('click', async () => {
-            if (!confirm('¿Restablecer todos los horarios a 00:00?')) return;
-            const resetData = {};
-            days.forEach(d => resetData[d] = { start: '00:00', end: '00:00' });
-            await saveHorarios(resetData);
-        });
-
-        loadHorarios();
+        cargarCategorias();
+        initHorarios();
     </script>
 </body>
 </html>
