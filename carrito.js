@@ -1,28 +1,101 @@
 let carrito = [];
+let carritoExpanded = false; // control para expandir/plegar la lista en el modal
 
-// 1. Función para añadir al carrito
-function añadirAlCarrito(nombre, precio) {
-  carrito.push({ nombre, precio: parseFloat(precio) });
+// Persistencia en localStorage
+function saveCarrito(){
+  try { localStorage.setItem('xamaran_carrito', JSON.stringify(carrito)); } catch(e){}
+}
+
+function loadCarrito(){
+  try{
+    const raw = localStorage.getItem('xamaran_carrito');
+    if (raw){ const parsed = JSON.parse(raw); if (Array.isArray(parsed)) carrito = parsed; }
+  }catch(e){}
+}
+
+function toggleListaCarrito(){
+  carritoExpanded = !carritoExpanded;
   actualizarInterfazCarrito();
 }
 
-// 2. Función para actualizar los números de la cabecera
-function actualizarInterfazCarrito() {
-  const cantidadTotal = carrito.length;
-  const precioTotal = carrito.reduce((sum, item) => sum + item.precio, 0);
+// 1. Función para añadir al carrito (mantiene cantidad por producto)
+function añadirAlCarrito(nombre, precio) {
+  precio = parseFloat(precio);
+  const existente = carrito.find(it => it.nombre === nombre);
+  if (existente) {
+    existente.cantidad += 1;
+  } else {
+    carrito.push({ nombre, precio, cantidad: 1 });
+  }
+  actualizarInterfazCarrito();
+}
 
-  document.getElementById('carrito-cantidad').innerText = `${cantidadTotal} productos`;
-  document.getElementById('carrito-total').innerText = `${precioTotal.toFixed(2)} €`;
+// Eliminar un producto entero del carrito por nombre
+function eliminarDelCarrito(nombre){
+  const idx = carrito.findIndex(it => it.nombre === nombre);
+  if (idx === -1) return;
+  carrito.splice(idx, 1);
+  saveCarrito();
+  actualizarInterfazCarrito();
+}
+
+// 2. Función para actualizar los números de la cabecera y el modal
+function actualizarInterfazCarrito() {
+  const cantidadTotal = carrito.reduce((s, it) => s + it.cantidad, 0);
+  const precioTotal = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+
+  const elCantidad = document.getElementById('carrito-cantidad');
+  const elTotal = document.getElementById('carrito-total');
+  if (elCantidad) elCantidad.innerText = `${cantidadTotal} productos`;
+  if (elTotal) elTotal.innerText = `${precioTotal.toFixed(2)} €`;
   
-  // Actualizar la lista visual dentro del modal
+  // Actualizar la lista visual dentro del modal con nombre, cantidad, subtotal
   const lista = document.getElementById('lista-carrito');
-  lista.innerHTML = '';
-  carrito.forEach(item => {
-    const li = document.createElement('li');
-    li.innerText = `${item.nombre} - ${item.precio.toFixed(2)} €`;
-    lista.appendChild(li);
-  });
-  document.getElementById('modal-total').innerText = `${precioTotal.toFixed(2)} €`;
+  const summaryEl = document.getElementById('carrito-summary');
+  if (lista) {
+    lista.innerHTML = '';
+    const itemsToRender = carritoExpanded ? carrito : [];
+    itemsToRender.forEach(item => {
+      const li = document.createElement('li');
+      const subtotal = (item.precio * item.cantidad).toFixed(2);
+      li.innerHTML = `
+        <div class="lista-info">
+          <span class="lista-nombre">${item.nombre}</span>
+          <span class="lista-cantidad">Cantidad: ${item.cantidad}</span>
+        </div>
+        <span class="lista-subtotal">${subtotal} €</span>
+      `;
+      // botón eliminar
+      const btn = document.createElement('button');
+      btn.className = 'btn-eliminar';
+      btn.type = 'button';
+      btn.textContent = 'Eliminar';
+      btn.addEventListener('click', function(e){ e.stopPropagation(); eliminarDelCarrito(item.nombre); });
+      li.appendChild(btn);
+      lista.appendChild(li);
+    });
+    // Mostrar u ocultar la lista completa; el summary contiene el toggle y resumen compacto
+    if (!summaryEl) {
+      // fallback: always show list
+      lista.style.display = '';
+    } else {
+      if (carrito.length === 0) {
+        summaryEl.innerText = 'Carrito vacío';
+        lista.style.display = 'none';
+      } else if (!carritoExpanded) {
+        const visibles = 0; // when collapsed we hide items entirely
+        summaryEl.innerHTML = `<span>${cantidadTotal} productos — ${precioTotal.toFixed(2)} €</span> <button class="btn-toggle" onclick="toggleListaCarrito()">Mostrar ${carrito.length - visibles} productos</button>`;
+        lista.style.display = 'none';
+      } else {
+        summaryEl.innerHTML = `<button class="btn-toggle" onclick="toggleListaCarrito()">Ocultar lista</button>`;
+        lista.style.display = '';
+      }
+    }
+  }
+  const modalTotal = document.getElementById('modal-total');
+  if (modalTotal) modalTotal.innerText = `${precioTotal.toFixed(2)} €`;
+  // persistir cambios
+  saveCarrito();
 }
 
 // 3. Modifica tu función renderizarProductos existente:
@@ -48,8 +121,80 @@ function renderizarProductos(productosParaMostrar) {
   });
 }
 
-// 4. Lógica para abrir/cerrar el listado (Modal)
-const modal = document.getElementById('carrito-modal');
-document.getElementById('abrir-carrito').onclick = () => modal.style.display = "block";
-document.querySelector('.cerrar-modal').onclick = () => modal.style.display = "none";
-window.onclick = (event) => { if (event.target == modal) modal.style.display = "none"; }
+// 4. Lógica para abrir/cerrar el listado (Modal) — registrar al cargar el DOM
+document.addEventListener('DOMContentLoaded', function(){
+  // cargar carrito desde localStorage antes de usarlo
+  loadCarrito();
+  // asegurarse de que el estado inicial del desplegable esté en collapsed
+  carritoExpanded = false;
+  actualizarInterfazCarrito();
+  const modal = document.getElementById('carrito-modal');
+  const abrir = document.getElementById('abrir-carrito');
+  const cerrar = document.querySelector('.cerrar-modal');
+  if (abrir && modal) {
+    abrir.addEventListener('click', function(e){
+      e.stopPropagation();
+      modal.style.display = 'block';
+      actualizarInterfazCarrito();
+    });
+  }
+  if (cerrar && modal) {
+    cerrar.addEventListener('click', function(){ modal.style.display = 'none'; });
+  }
+  window.addEventListener('click', function(event){ if (event.target === modal) modal.style.display = 'none'; });
+});
+
+// 5. Finalizar compra: confirmar, enviar email vía EmailJS y notificar al usuario
+function finalizarCompra(){
+  if (!carrito || carrito.length === 0) {
+    alert('El carrito está vacío. Añade productos antes de finalizar.');
+    return;
+  }
+  // recoger datos del formulario
+  const nameEl = document.getElementById('cliente-nombre');
+  const emailEl = document.getElementById('cliente-email');
+  const clienteNombre = nameEl ? nameEl.value.trim() : '';
+  const clienteEmail = emailEl ? emailEl.value.trim() : '';
+
+  if (!clienteNombre) { alert('Introduce tu nombre.'); if(nameEl) nameEl.focus(); return; }
+  const emailRegex = /^\S+@\S+\.\S+$/;
+  if (!clienteEmail || !emailRegex.test(clienteEmail)) { alert('Introduce un correo válido.'); if(emailEl) emailEl.focus(); return; }
+
+  if (!confirm('¿Deseas enviar el pedido a la tienda?')) return;
+
+  const precioTotal = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0).toFixed(2);
+  const itemsPlain = carrito.map(it => `${it.nombre} x${it.cantidad} — ${(it.precio * it.cantidad).toFixed(2)} €`).join('\n');
+
+  // templateParams — ajusta los nombres según tu plantilla en EmailJS
+  const templateParams = {
+    to_name: 'Tienda Xamaran',
+    from_name: clienteNombre,
+    from_email: clienteEmail,
+    client_name: clienteNombre,
+    client_email: clienteEmail,
+    items: itemsPlain,
+    total: `${precioTotal} €`,
+    timestamp: new Date().toLocaleString()
+  };
+
+  // Reemplaza 'YOUR_SERVICE_ID' y 'YOUR_TEMPLATE_ID' por los valores de EmailJS
+  if (typeof emailjs === 'undefined'){
+    alert('EmailJS no está cargado. Añade el script de EmailJS y tu user ID en el HTML.');
+    return;
+  }
+
+  emailjs.send('service_ppc0l1c','template_a25b6vo', templateParams)
+    .then(function(response){
+      alert('Pedido solicitado a la tienda. Gracias.');
+      // limpiar carrito tras enviar
+      carrito = [];
+      if (nameEl) nameEl.value = '';
+      if (emailEl) emailEl.value = '';
+      actualizarInterfazCarrito();
+      // cerrar modal si está abierto
+      const modal = document.getElementById('carrito-modal'); if (modal) modal.style.display = 'none';
+    }, function(error){
+      console.error('EmailJS error:', error);
+      alert('Error al enviar el pedido. Intenta de nuevo más tarde.');
+    });
+}

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Configuración - Xamaran</title>
+    <link rel="stylesheet" href="Config.css" />
+    <style>
+        /* Estilos adicionales */
+        #panelEdicion {
+            display: none;
+            background: #f8f9fa;
+            border: 2px solid #007bff;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .search-container { margin: 20px 0; }
+        #buscador {
+            width: 100%; padding: 10px; font-size: 1.1em;
+            border: 1px solid #ccc; border-radius: 5px;
+        }
+        .grid-productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px; margin-bottom: 40px;
+        }
+        .producto-card {
+            border: 1px solid #ddd; padding: 15px; border-radius: 8px;
+            background: #fff; text-align: center;
+        }
+        .btn-editar {
+            background: #ffc107; color: #000; border: none;
+            padding: 8px 15px; cursor: pointer; border-radius: 5px;
+            font-weight: bold; margin-top: 10px; width: 100%;
+        }
+        .btn-cancelar {
+            background: #dc3545; color: white; border: none;
+            padding: 10px 15px; cursor: pointer; border-radius: 5px; margin-top: 10px;
+        }
+        .img-mini { max-width: 100px; display: block; margin: 10px auto; border-radius: 4px; }
+        .msg { padding: 10px; margin-top: 10px; border-radius: 5px; display: none; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            color: white !important;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            font-size: 0.9em;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            border: 2px solid transparent;
+        }
+
+        .btn-back:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
+            border-color: var(--primary);
+        }
+
+        .btn-back i {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-back:hover i {
+            transform: scale(1.2);
+        }
+        
+        #btnAddProduct {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white !important;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 8px;
+            font-size: 0.95em;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            cursor: pointer;
+        }
+
+        #btnAddProduct::before {
+            content: '+';
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        #btnAddProduct:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+            filter: brightness(1.1);
+        }
+
+        #btnAddProduct:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Panel de Configuración Xamaran</h1>
+        <a href="Config.html" class="btn-back">
+            <span>←</span> Volver a Configuración
+        </a><div class="container">
+            
+        <section id="panelEdicion">
+        <h2>Editar Producto</h2>
+        <form id="formEdicion">
+            <input type="hidden" id="editNombreOriginal">
+            
+            <label for="editNombre">Nombre del producto *</label>
+            <input type="text" id="editNombre" required>
+
+            <div class="small-row">
+                <div class="col">
+                    <label for="editPrecio">Precio (€) *</label>
+                    <input type="number" id="editPrecio" step="0.01" min="0" required>
+                </div>
+                <div class="col">
+                    <label for="editCategoria">Categoría *</label>
+                    <select id="editCategoria" required></select>
+                </div>
+            </div>
+
+            <label for="editDesc">Descripción</label>
+            <textarea id="editDesc" rows="2"></textarea>
+
+            <label for="editMarca">Marca</label>
+            <input type="text" id="editMarca">
+
+            <label>Cambiar Imagen</label>
+            <input type="file" id="editImagenFile" accept="image/*">
+            <input type="hidden" id="editImagenUrl">
+            <button type="button" id="btnSubirEditImg" style="background: #6f42c1; color: white; border: none; padding: 5px; margin-top: 5px; cursor: pointer;">Subir Nueva Imagen</button>
+            <div id="editImgStatus"></div>
+
+            <div style="margin-top: 20px;">
+                <button type="submit" style="background: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">Guardar Cambios</button>
+                <button type="button" class="btn-cancelar" onclick="cerrarEdicion()">Cancelar</button>
+            </div>
+            <div id="editMsg" class="msg"></div>
+        </form>
+    </section>
+
+    <section class="lista-productos">
+        <h2>Inventario de Productos</h2>
+       <a id="btnAddProduct" href="#productoForm">Añadir Nuevo Producto</a>
+        <div class="search-container">
+            <input type="text" id="buscador" placeholder="🔍 Buscar producto por nombre, marca o categoría...">
+        </div>
+        <div id="gridProductos" class="grid-productos"></div>
+    </section>
+
+    <hr>
+
+    <section class="product-form">
+        <h2>Añadir Nuevo Producto</h2>
+        <form id="productoForm">
+            <label for="prodNombre">Nombre del producto *</label>
+            <input type="text" id="prodNombre" required>
+
+            <div class="small-row">
+                <div class="col">
+                    <label for="prodPrecio">Precio (€) *</label>
+                    <input type="number" id="prodPrecio" step="0.01" min="0" required>
+                </div>
+                <div class="col">
+                    <label for="prodCategoria">Categoría *</label>
+                    <select id="prodCategoria" required></select>
+                </div>
+            </div>
+
+            <label for="prodDesc">Descripción (Opcional)</label>
+            <textarea id="prodDesc" rows="2"></textarea>
+
+            <label for="prodMarca">Marca (Opcional)</label>
+            <input type="text" id="prodMarca">
+
+            <label>Imagen del producto</label>
+            <input type="file" id="prodImagen" accept="image/*">
+            <div class="small-row">
+                <button type="button" id="btnUploadProdImg" style="background: #6f42c1; color: white; border: none; padding: 10px; cursor: pointer;">1. Subir Imagen</button>
+            </div>
+            
+            <div id="prodImgUrlDisplay"></div>
+            <img id="imgPreview" src="" alt="Vista previa" style="display:none; max-width: 200px; margin-top:10px;">
+            <input type="hidden" id="prodImagenUrl">
+
+            <div style="margin-top: 30px;">
+                <button type="submit" style="width: 100%; font-size: 1.1em; padding: 15px; background: #007bff; color: white; border: none; cursor: pointer;">2. Guardar Producto</button>
+            </div>
+            <div id="productoMsg" class="msg"></div>
+        </form>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://gcaknxodxvoshqibskfo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8'; // Asegúrate de usar tu clave correcta
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let categoriasBase = ['Snacks', 'Chocolates', 'Chuches', 'Bebidas', 'Helados', 'Frutos Secos', 'Galletas', 'Varios'];
+        let todosLosProductos = []; 
+
+        function cargarCategorias() {
+            const selects = [document.getElementById('prodCategoria'), document.getElementById('editCategoria')];
+            selects.forEach(sel => {
+                sel.innerHTML = '<option value="" disabled selected>Selecciona...</option>';
+                categoriasBase.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat; opt.textContent = cat;
+                    sel.appendChild(opt);
+                });
+            });
+        }
+
+        // --- FUNCIÓN ÚNICA PARA SUBIR IMÁGENES ---
+        async function subirImagenGenerica(file, categoria, btnElement, statusElement) {
+            if (!file || !categoria) {
+                alert("Falta archivo o categoría");
+                return null;
+            }
+
+            btnElement.textContent = "Subiendo...";
+            btnElement.disabled = true;
+
+            const fileExt = file.name.split('.').pop();
+            const fileName = file.name; // Usar el nombre original del archivo seleccionado
+            const filePath = `${categoria}/${fileName}`;
+
+            const { data, error } = await _supabase.storage
+                .from('productos')
+                .upload(filePath, file);
+
+            if (error) {
+                statusElement.textContent = "Error: " + error.message;
+                btnElement.textContent = "Reintentar";
+                btnElement.disabled = false;
+                return null;
+            }
+
+            btnElement.textContent = "¡Subido!";
+            btnElement.style.background = "#28a745";
+            btnElement.disabled = false;
+            // Obtener la URL pública y retornarla
+            const { data: publicData } = _supabase.storage.from('productos').getPublicUrl(filePath);
+            return publicData && publicData.publicUrl ? publicData.publicUrl : fileName;
+        }
+
+        // --- LOGICA DE PRODUCTOS ---
+        async function fetchProductos() {
+            const { data, error } = await _supabase.from('productos').select('*');
+            if (!error) {
+                todosLosProductos = data;
+                renderizarProductos(data);
+            }
+        }
+
+        function renderizarProductos(productos) {
+            const grid = document.getElementById('gridProductos');
+            grid.innerHTML = productos.map(prod => `
+                <div class="producto-card">
+                    ${prod.imagen ? `<img src="${prod.imagen}" class="img-mini" alt="${prod.nombre}">` : ''}
+                    <h3>${prod.nombre}</h3>
+                    <p>Price: ${prod.precio} €</p>
+                    <button class="btn-editar" onclick="abrirEditor('${encodeURIComponent(prod.nombre)}')">✏️ Editar</button>
+                </div>
+            `).join('');
+        }
+
+        // --- EVENTOS DE SUBIDA ---
+        document.getElementById('btnUploadProdImg').addEventListener('click', async () => {
+            const file = document.getElementById('prodImagen').files[0];
+            const cat = document.getElementById('prodCategoria').value;
+            const res = await subirImagenGenerica(file, cat, document.getElementById('btnUploadProdImg'), document.getElementById('prodImgUrlDisplay'));
+            if(res) {
+                document.getElementById('prodImagenUrl').value = res;
+                document.getElementById('prodImgUrlDisplay').textContent = res;
+                const imgPrev = document.getElementById('imgPreview');
+                imgPrev.src = res;
+                imgPrev.style.display = 'block';
+            }
+        });
+
+        document.getElementById('btnSubirEditImg').addEventListener('click', async () => {
+            const file = document.getElementById('editImagenFile').files[0];
+            const cat = document.getElementById('editCategoria').value;
+            const res = await subirImagenGenerica(file, cat, document.getElementById('btnSubirEditImg'), document.getElementById('editImgStatus'));
+            if(res) {
+                document.getElementById('editImagenUrl').value = res;
+                document.getElementById('editImgStatus').innerHTML = `<div>URL: ${res}</div><img src="${res}" class="img-mini">`;
+            }
+        });
+
+        // --- GUARDAR Y EDITAR ---
+        document.getElementById('productoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const datos = {
+                nombre: document.getElementById('prodNombre').value,
+                precio: parseFloat(document.getElementById('prodPrecio').value),
+                categoria: document.getElementById('prodCategoria').value,
+                Descripcion: document.getElementById('prodDesc').value,
+                marca: document.getElementById('prodMarca').value,
+                imagen: document.getElementById('prodImagenUrl').value // Aquí está la URL pública de la imagen
+            };
+
+            const { error } = await _supabase.from('productos').insert([datos]);
+            if (!error) {
+                alert("Producto creado");
+                location.reload();
+            } else {
+                alert("Error: " + error.message);
+            }
+        });
+
+        function abrirEditor(nombreCodificado) {
+            const nombre = decodeURIComponent(nombreCodificado);
+            const p = todosLosProductos.find(x => x.nombre === nombre);
+            if(!p) return;
+
+            document.getElementById('editNombreOriginal').value = p.nombre;
+            document.getElementById('editNombre').value = p.nombre;
+            document.getElementById('editPrecio').value = p.precio;
+            document.getElementById('editCategoria').value = p.categoria;
+            document.getElementById('editDesc').value = p.Descripcion || '';
+            document.getElementById('editMarca').value = p.marca || '';
+            document.getElementById('editImagenUrl').value = p.imagen || '';
+
+            document.getElementById('panelEdicion').style.display = 'block';
+        }
+
+        document.getElementById('formEdicion').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombreOri = document.getElementById('editNombreOriginal').value;
+            const datos = {
+                nombre: document.getElementById('editNombre').value,
+                precio: parseFloat(document.getElementById('editPrecio').value),
+                categoria: document.getElementById('editCategoria').value,
+                Descripcion: document.getElementById('editDesc').value,
+                marca: document.getElementById('editMarca').value,
+                imagen: document.getElementById('editImagenUrl').value
+            };
+
+            const { error } = await _supabase.from('productos').update(datos).eq('nombre', nombreOri);
+            if(!error) {
+                alert("Actualizado");
+                cerrarEdicion();
+                fetchProductos();
+            }
+        });
+
+        function cerrarEdicion() { document.getElementById('panelEdicion').style.display = 'none'; }
+
+        // Inicio
+        cargarCategorias();
+        fetchProductos();
+    </script>
+</body>
+</html>

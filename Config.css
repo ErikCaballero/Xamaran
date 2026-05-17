@@ -1,0 +1,79 @@
+/* Estilos Base */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; margin: 0; }
+        h1, h2 { color: #2c3e50; text-align: center; }
+
+        .schedule-form, .product-form, .preview {
+            max-width: 700px; 
+            margin: 20px auto; 
+            padding: 25px;
+            background: #fff; 
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .day-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+        .day-row label { width: 110px; font-weight: 600; color: #444; }
+        .day-row input[type="time"] { flex: 1; padding: 8px; border: 1px solid #ccd1d9; border-radius: 6px; }
+
+        .product-form label { display: block; margin-top: 15px; font-weight: 600; font-size: 0.95em; }
+        .product-form input, .product-form select, .product-form textarea {
+            width: 100%; padding: 12px; margin-top: 6px;
+            box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .small-row { display: flex; gap: 15px; align-items: flex-end; margin-top: 10px; }
+        .col { flex: 1; }
+
+        button {
+            cursor: pointer; padding: 12px 20px; border-radius: 6px;
+            border: none; font-weight: bold; transition: all 0.2s ease;
+        }
+        button[type="submit"], .btn-primary { background: #6f42c1; color: white; }
+        button[type="submit"]:hover, .btn-primary:hover { background: #5a32a3; transform: translateY(-1px); }
+        #resetBtn { background: #dc3545; color: white; margin-left: 10px; }
+
+        .msg { padding: 15px; border-radius: 6px; margin-top: 20px; display: none; font-size: 0.9em; }
+        .msg.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .msg.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        #imgPreview { max-width: 180px; margin-top: 15px; border-radius: 8px; display: none; border: 2px solid #eee; }
+        #prodImgUrlDisplay { 
+            font-size: 0.8em; word-break: break-all; color: #666; 
+            background: #f8f9fa; padding: 8px; border-radius: 6px; 
+            margin-top: 12px; border: 1px solid #eee; 
+        }
+
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            color: white !important;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            font-size: 0.9em;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            border: 2px solid transparent;
+        }
+
+        .btn-back:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
+            border-color: var(--primary);
+        }
+
+        .btn-back i {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-back:hover i {
+            transform: scale(1.2);
+        }

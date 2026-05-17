@@ -42,22 +42,115 @@
 
 /* Modal del Carrito */
 .modal-carrito {
-  display: none; 
+  display: none;
   position: fixed;
   z-index: 1000;
   left: 0; top: 0; width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.75) 60%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 30px 16px;
 }
 
 .modal-contenido {
-  background-color: white;
-  margin: 10% auto;
-  padding: 20px;
-  width: 80%;
-  max-width: 400px;
+  background: linear-gradient(135deg, #fff0f8 0%, #ffe6fb 45%, #ffd6f5 100%);
+  margin: 6% auto;
+  padding: 18px;
+  width: 92%;
+  max-width: 520px;
+  border-radius: 16px;
+  color: #2b132b;
+  border: 4px solid rgba(255,102,196,0.18);
+  box-shadow: 0 18px 40px rgba(138,43,226,0.18);
+  font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', Arial;
+  position: relative;
+}
+
+.modal-contenido h2{
+  margin-top: 0;
+  color: #ff2fa0;
+  text-align: center;
+  font-size: 1.5rem;
+  text-shadow: 0 2px 6px rgba(255,63,168,0.12);
+}
+
+.cerrar-modal{
+  position: absolute;
+  right: 18px;
+  top: 12px;
+  font-size: 28px;
+  cursor: pointer;
+  color: #9b0f6b;
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid rgba(255,63,168,0.15);
+}
+
+#lista-carrito{ list-style: none; padding: 6px 0; margin: 6px 0 12px 0; max-height: 260px; overflow:auto; }
+#lista-carrito li{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  margin: 8px 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,240,250,0.6));
   border-radius: 10px;
-  color: #333;
-}   
+  border: 1px solid rgba(255,102,196,0.12);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+  font-size: 0.95rem;
+}
+
+.lista-info{
+  display:flex; flex-direction:column; gap:4px; max-width:70%;
+}
+.lista-subtotal{ font-weight:800; color:#7a0b6b }
+
+.modal-total-row{ display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:8px; border-top:1px dashed rgba(255,102,196,0.15); }
+.modal-total-row strong{ color:#c2007a; font-size:1.15rem }
+
+/* boton limpiar o confirmar dentro del modal (opcional) */
+.modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:12px }
+.modal-actions button{ background:#ff66c4; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer }
+.modal-actions button.secondary{ background:transparent; color:#c2007a; border:1px solid rgba(194,0,122,0.12) }
+/* Form fields inside modal */
+.modal-form{ display:flex; flex-direction:column; gap:8px; margin-top:12px }
+.modal-form label{ font-size:0.9rem; color:#6b0b4f }
+.modal-form input{ padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); font-size:0.95rem }
+.modal-form input:focus{ outline:none; box-shadow: 0 6px 18px rgba(255,102,196,0.12); border-color:#ff66c4 }
+
+/* Toggle button for showing more/less items */
+.lista-toggle{ display:flex; justify-content:center; }
+.btn-toggle{ background:transparent; border:1px dashed rgba(194,0,122,0.18); color:#c2007a; padding:6px 10px; border-radius:8px; cursor:pointer }
+.btn-toggle:hover{ background: rgba(255,102,196,0.06); }
+
+.carrito-summary{ display:flex; gap:10px; align-items:center; justify-content:space-between; padding:6px 4px; margin-bottom:8px; color:#5a0a4a }
+.carrito-summary span{ font-weight:700 }
+
+/* Estilo botón eliminar por fila */
+.btn-eliminar{ background:transparent; color:#b71b6f; border:1px solid rgba(183,27,111,0.12); padding:6px 8px; border-radius:8px; cursor:pointer; margin-left:12px }
+.btn-eliminar:hover{ background: rgba(183,27,111,0.06); }
+
+/* Animación para botella que rota hacia abajo y cambia a imagen derramada */
+.imagenbotella{
+  display:inline-block;
+  transform-origin: center top;
+  cursor: pointer;
+  transition: transform 300ms ease;
+  top: 0;
+}
+.rotar-botella{
+  animation: rotar45 700ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes rotar45{
+  0% { transform: rotate(0deg); }
+  70% { transform: rotate(32deg); }
+  100% { transform: rotate(45deg); }
+}
    
    .section-block {
       padding: 50px 20px;

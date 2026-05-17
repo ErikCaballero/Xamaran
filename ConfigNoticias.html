@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Configuración Noticias - Xamaran</title>
+    <style>
+        :root { --primary: #f39c12; --dark: #2c3e50; --edit: #007bff; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; }
+        h1, h2 { color: var(--dark); text-align: center; }
+
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Paneles */
+        .card { 
+            background: #fff; padding: 25px; border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 30px; 
+        }
+        
+        #panelEdicion { 
+            display: none; border: 2px solid var(--edit); background: #f0f7ff; 
+        }
+
+        /* Formulario */
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.9em; }
+        input[type="text"], textarea { 
+            width: 100%; padding: 12px; margin-top: 5px; 
+            border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; 
+        }
+
+        .checkbox-container {
+            display: flex; align-items: center; gap: 10px;
+            margin: 15px 0; padding: 10px; background: #fff; border-radius: 6px;
+        }
+
+        /* Botones */
+        button { 
+            cursor: pointer; border-radius: 8px; border: none; 
+            font-weight: bold; transition: 0.3s; padding: 12px 20px; 
+        }
+        .btn-save { background: var(--dark); color: white; width: 100%; margin-top: 15px; }
+        .btn-upload { background: var(--primary); color: white; font-size: 0.8em; margin: 10px 0; }
+        .btn-edit { background: #ffc107; color: #000; padding: 5px 10px; font-size: 0.8em; }
+        .btn-cancel { background: #dc3545; color: white; margin-top: 10px; }
+
+        /* Lista de noticias */
+        .news-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; border-bottom: 1px solid #eee;
+        }
+        .img-preview { 
+            max-width: 100px; height: 60px; object-fit: cover; 
+            border-radius: 4px; margin-top: 10px; display: none; 
+        }
+        .status-badge { font-size: 0.7em; padding: 2px 5px; border-radius: 4px; background: #e0e0e0; }
+        .is-new { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+
+        /* Botón Volver a Configuración Llamativo */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            color: white !important;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            font-size: 0.9em;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            border: 2px solid transparent;
+        }
+
+        .btn-back:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
+            border-color: var(--primary);
+        }
+
+        .btn-back i {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-back:hover i {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+        <a href="Config.html" class="btn-back">
+            <span>←</span> Volver a Configuración
+        </a><div class="container">
+
+    <h1>Panel de Noticias</h1>
+
+    <section id="panelEdicion" class="card">
+        <h2>✏️ Editar Noticia</h2>
+        <form id="formEdicion">
+            <input type="hidden" id="editId">
+            
+            <label>Título</label>
+            <input type="text" id="editTitle" required>
+
+            <label>Contenido</label>
+            <textarea id="editDesc" rows="4" required></textarea>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="editIsNew">
+                <label for="editIsNew" style="margin:0;">Destacar como Novedad</label>
+            </div>
+
+            <label>Cambiar Imagen</label>
+            <input type="file" id="editFile" accept="image/*">
+            <button type="button" id="btnUploadEdit" class="btn-upload">Subir Nueva Imagen</button>
+            <input type="hidden" id="editImageUrl">
+            <img id="editImgPreview" class="img-preview" style="display:block;">
+
+            <button type="submit" class="btn-save" style="background: var(--edit);">Actualizar Noticia</button>
+            <button type="button" class="btn-cancel" onclick="cerrarEdicion()">Cancelar</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Noticias Publicadas</h2>
+        <div id="listaNoticias">Cargando noticias...</div>
+    </section>
+
+    <section class="card">
+        <h2>Añadir Nueva Noticia</h2>
+        <form id="addForm">
+            <label>Título *</label>
+            <input type="text" id="addTitle" required>
+
+            <label>Contenido *</label>
+            <textarea id="addDesc" rows="4" required></textarea>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="addIsNew">
+                <label for="addIsNew" style="margin:0;">Destacar como Novedad</label>
+            </div>
+
+            <label>Imagen *</label>
+            <input type="file" id="addFile" accept="image/*">
+            <button type="button" id="btnUploadAdd" class="btn-upload">1. Subir Imagen</button>
+            <input type="hidden" id="addImageUrl">
+            <img id="addImgPreview" class="img-preview">
+
+            <button type="submit" class="btn-save">2. Publicar Noticia</button>
+        </form>
+    </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://gcaknxodxvoshqibskfo.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8';
+    const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let noticiasLocales = [];
+
+    // --- CARGAR LISTADO ---
+    async function cargarListado() {
+        const { data, error } = await _supabase.from('noticias').select('*').order('created_at', { ascending: false });
+        if (error) return console.error(error);
+        
+        noticiasLocales = data;
+        const contenedor = document.getElementById('listaNoticias');
+        contenedor.innerHTML = data.map(n => `
+            <div class="news-item">
+                <div>
+                    <strong>${n.titulo}</strong> 
+                    ${n.es_novedad === true || n.es_novedad === 'true' ? '<span class="status-badge is-new">Novedad</span>' : ''}
+                </div>
+                <button class="btn-edit" onclick="prepararEdicion(${n.id})">Editar</button>
+            </div>
+        `).join('');
+    }
+
+    // --- SUBIDA DE IMAGEN (FUNCIÓN REUTILIZABLE) ---
+    async function subirFoto(file, btnId, inputId, imgPrevId) {
+        if (!file) return alert("Selecciona un archivo");
+        const btn = document.getElementById(btnId);
+        btn.textContent = "Subiendo...";
+        
+        const filePath = `noticia_${Date.now()}_${file.name}`;
+        const { data, error } = await _supabase.storage.from('Noticias').upload(filePath, file);
+
+        if (error) {
+            alert("Error: " + error.message);
+            btn.textContent = "Error";
+        } else {
+            const { data: pData } = _supabase.storage.from('Noticias').getPublicUrl(filePath);
+            document.getElementById(inputId).value = pData.publicUrl;
+            const prev = document.getElementById(imgPrevId);
+            prev.src = pData.publicUrl;
+            prev.style.display = 'block';
+            btn.textContent = "¡Subida!";
+            btn.style.background = "#28a745";
+        }
+    }
+
+    document.getElementById('btnUploadAdd').onclick = () => subirFoto(document.getElementById('addFile').files[0], 'btnUploadAdd', 'addImageUrl', 'addImgPreview');
+    document.getElementById('btnUploadEdit').onclick = () => subirFoto(document.getElementById('editFile').files[0], 'btnUploadEdit', 'editImageUrl', 'editImgPreview');
+
+    // --- GUARDAR NUEVA ---
+    document.getElementById('addForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const nueva = {
+            titulo: document.getElementById('addTitle').value,
+            descripcion: document.getElementById('addDesc').value,
+            es_novedad: document.getElementById('addIsNew').checked,
+            imagen: document.getElementById('addImageUrl').value
+        };
+        const { error } = await _supabase.from('noticias').insert([nueva]);
+        if (!error) { alert("Publicado"); location.reload(); }
+    };
+
+    // --- EDITAR ---
+    function prepararEdicion(id) {
+        const n = noticiasLocales.find(item => item.id === id);
+        if (!n) return;
+
+        document.getElementById('editId').value = n.id;
+        document.getElementById('editTitle').value = n.titulo;
+        document.getElementById('editDesc').value = n.descripcion;
+        document.getElementById('editIsNew').checked = n.es_novedad;
+        document.getElementById('editImageUrl').value = n.imagen;
+        document.getElementById('editImgPreview').src = n.imagen;
+        document.getElementById('editImgPreview').style.display = 'block';
+
+        document.getElementById('panelEdicion').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('formEdicion').onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editId').value;
+        const actualizados = {
+            titulo: document.getElementById('editTitle').value,
+            descripcion: document.getElementById('editDesc').value,
+            es_novedad: document.getElementById('editIsNew').checked,
+            imagen: document.getElementById('editImageUrl').value
+        };
+
+        const { error } = await _supabase.from('noticias').update(actualizados).eq('id', id);
+        if (!error) {
+            alert("Noticia actualizada");
+            cerrarEdicion();
+            cargarListado();
+        } else {
+            alert("Error: " + error.message);
+        }
+    };
+
+    function cerrarEdicion() { document.getElementById('panelEdicion').style.display = 'none'; }
+
+    // Iniciar
+    cargarListado();
+</script>
+
+</body>
+</html>

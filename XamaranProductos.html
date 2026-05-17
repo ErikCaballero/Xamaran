@@ -7,7 +7,13 @@
   <link rel="shortcut icon" href="img/XamaranLogo.png" type="image/x-icon">
   <link rel="stylesheet" href="General.css">
   <link rel="stylesheet" href="Productos.css">
-  <script src="carrito.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+      (function() {
+        emailjs.init("3A1BwhdoGJPZQM-Ud");
+      })();
+    </script>
+    <script src="carrito.js"></script>
 </head>
 <body>
   <header>
@@ -24,16 +30,31 @@
   <div class="modal-contenido">
     <span class="cerrar-modal">&times;</span>
     <h2>Tu Selección</h2>
+    <div id="carrito-summary" class="carrito-summary" aria-live="polite"></div>
     <ul id="lista-carrito">
       </ul>
     <hr>
-    <p><strong>Total: <span id="modal-total">0.00 €</span></strong></p>
+    <div class="modal-total-row">
+      <span><strong>Total:</strong></span>
+      <strong id="modal-total">0.00 €</strong>
+    </div>
+    <div class="modal-form">
+      <label for="cliente-nombre">Tu nombre</label>
+      <input id="cliente-nombre" type="text" placeholder="Tu nombre">
+      <label for="cliente-email">Tu email</label>
+      <input id="cliente-email" type="email" placeholder="tunombre@ejemplo.com">
+    </div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="document.getElementById('carrito-modal').style.display='none'">Seguir comprando</button>
+      <button onclick="finalizarCompra()">Finalizar compra</button>
+    </div>
   </div>
 </div>
   <nav>
     <a href="index.html">Inicio</a>
     <a href="XamaranProductos.html">Productos</a>
     <a href="XamaranContacto.html">Contacto</a>
+    <a href="XamaranNoticias.html">Noticias</a>
   </nav>
 
   <div class="section-block">
@@ -69,7 +90,7 @@
     </div>
     <div class="paquete" id="menufrutossecos">
       <img class="imagenfrutoseco1" src="img/cacahuete.png" alt="Cacahuete">
-      <img class="imagenfrutoseco2" src="img/Almendra.png" alt="Almendra">
+      <img class="imagenfrutoseco2" src="img/almendra.png" alt="Almendra">
       <img class="imagenfrutoseco3" src="img/pistacho.png" alt="Pistacho">
       <img class="imagenfrutoseco4" src="img/pipa.png" alt="Pipas">
       <span class="paquete-label">Frutos Secos</span>
@@ -79,14 +100,14 @@
       <span class="paquete-label">Galletas</span>
     </div>
     <div class="paquete" id="menualcohol">
-      <img class="imagenlata" src="img/latacocacola1.png" alt="Lata de cocalola cerrada">
-      <img class="imagenlata" src="img/latacocacola2.png" alt="Lata de cocalola abierta">
+      <img class="imagenlata botella" id="botella1" src="img/Botella.png" alt="Botella de bebida alcohólica">
+      <img class="imagenlata" id="botella2" src="img/BotellaDerramada.png" alt="Botella derramada">
       <span class="paquete-label">Bebidas Alcoholicas</span>
     </div>
     </section>
     <div class="paquete" id="menuotros">
       <img class="imagenlata" src="img/latacocacola1.png" alt="Lata de cocalola cerrada">
-      <img class="imagenlata" src="img/latacocacola2.png" alt="Lata de cocalola abierta">
+      <img class="imagenlata" src="img/.png" alt="Lata de cocalola abierta">
       <span class="paquete-label">Varios</span>
     </div>
     
@@ -105,8 +126,8 @@
     </section>
   </div>
 
-
-  <footer>
+   
+<footer>
     <h3>Contacto</h3>
     <p>Dirección: Errekatxu Kalea, 6, Bajo-Izquierda, 48100 Mungia, Biscay</p>
     <p>Txutxe Denda - Xamarian ©</p>
@@ -428,5 +449,6 @@
 
     document.addEventListener('DOMContentLoaded', cargarProductos);
   </script>
+  
 </body>
 </html>

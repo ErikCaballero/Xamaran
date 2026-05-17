@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noticias - Xamaran</title>
+  <link rel="stylesheet" href="General.css">
+  <style>
+    :root {
+      --primary: #f39c12;
+      --dark: #2c3e50;
+    }
+
+    .news-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h2 {
+      border-left: 5px solid var(--primary);
+      padding-left: 15px;
+      margin-bottom: 30px;
+      color: var(--dark);
+    }
+
+    /* Diseño de cuadrícula */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 50px;
+    }
+
+    /* Tarjeta de Noticia */
+    .news-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .news-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .news-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .news-content {
+      padding: 20px;
+    }
+
+    .news-tag {
+      background: var(--primary);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .news-title {
+      font-size: 1.4rem;
+      margin: 10px 0;
+      color: var(--dark);
+    }
+
+    .news-desc {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .news-date {
+      display: block;
+      margin-top: 15px;
+      font-size: 0.8rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Noticias Xamaran</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Inicio</a>
+    <a href="XamaranProductos.html">Productos</a>
+    <a href="XamaranContacto.html">Contacto</a>
+    <a href="XamaranNoticias.html">Noticias</a>
+  </nav>
+
+  <div class="news-container">
+    
+    <section>
+      <h2>Lo más nuevo</h2>
+      <div id="grid-novedades" class="news-grid">
+        </div>
+    </section>
+
+    <hr>
+
+    <section>
+      <h2>Archivo de Noticias</h2>
+      <div id="grid-general" class="news-grid">
+        </div>
+    </section>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const supabaseUrl = 'https://gcaknxodxvoshqibskfo.supabase.co'; 
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8'; 
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+    async function cargarNoticias() {
+      // Obtenemos todas las noticias ordenadas por fecha de creación (más nuevas primero)
+      const { data: noticias, error } = await supabaseClient
+        .from('noticias')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error cargando noticias:', error.message);
+        return;
+      }
+
+      // Separamos las 3 primeras para "Novedades" y el resto para "General"
+      const novedades = noticias.slice(0, 3);
+      const resto = noticias.slice(3);
+
+      renderizarSeccion(novedades, 'grid-novedades', true);
+      renderizarSeccion(resto, 'grid-general', false);
+    }
+
+    function renderizarSeccion(lista, contenedorId, esNovedad) {
+      const contenedor = document.getElementById(contenedorId);
+      contenedor.innerHTML = '';
+
+      if (lista.length === 0) {
+        contenedor.innerHTML = '<p>No hay noticias disponibles en esta sección.</p>';
+        return;
+      }
+
+      lista.forEach(noticia => {
+        const card = document.createElement('article');
+        card.className = 'news-card';
+        
+        // Formatear la fecha
+        const fecha = noticia.created_at ? new Date(noticia.created_at).toLocaleDateString() : '';
+
+        card.innerHTML = `
+          <img src="${noticia.imagen || 'img/news-placeholder.jpg'}" class="news-image" alt="${noticia.titulo}">
+          <div class="news-content">
+            ${esNovedad ? '<span class="news-tag">Nuevo</span>' : ''}
+            <h3 class="news-title">${noticia.titulo}</h3>
+            <p class="news-desc">${noticia.descripcion}</p>
+            <span class="news-date">${fecha}</span>
+          </div>
+        `;
+        contenedor.appendChild(card);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarNoticias);
+  </script>
+</body>
+</html>

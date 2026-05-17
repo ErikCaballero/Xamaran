@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gestión de Marcas - Xamaran</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; }
+        h1, h2 { color: #2c3e50; text-align: center; }
+
+        /* Panel Edición */
+        #panelEdicion {
+            display: none; background: #fff; border: 2px solid #6f42c1;
+            padding: 25px; margin: 20px auto; max-width: 600px;
+            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Formulario y Grid */
+        .brand-form, .lista-marcas { max-width: 800px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        input[type="text"], input[type="file"] { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        
+        .grid-marcas { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
+        .marca-card { border: 1px solid #eee; padding: 15px; border-radius: 10px; text-align: center; background: #fdfdfd; }
+        
+        /* Botones */
+        button { cursor: pointer; border-radius: 6px; border: none; font-weight: bold; transition: 0.3s; padding: 10px 15px; }
+        .btn-primary { background: #007bff; color: white; width: 100%; }
+        .btn-upload { background: #6f42c1; color: white; margin-bottom: 10px; }
+        .btn-editar { background: #ffc107; color: #000; width: 100%; margin-top: 10px; }
+        .btn-cancelar { background: #dc3545; color: white; margin-top: 10px; }
+
+        .img-preview { max-width: 120px; height: 80px; object-fit: contain; display: block; margin: 10px auto; border: 1px solid #eee; padding: 5px; }
+        .msg { padding: 10px; margin-top: 10px; border-radius: 5px; display: none; text-align: center; }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            color: white !important;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            font-size: 0.9em;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            border: 2px solid transparent;
+        }
+
+        .btn-back:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%);
+            border-color: var(--primary);
+        }
+
+        .btn-back i {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-back:hover i {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+        <a href="Config.html" class="btn-back">
+            <span>←</span> Volver a Configuración
+        </a><div class="container">
+    <h1>Gestión de Marcas Xamaran</h1>
+
+    <section id="panelEdicion">
+        <h2>Editar Marca</h2>
+        <form id="formEdicionMarca">
+            <input type="hidden" id="editNombreOriginal">
+            
+            <label>Nombre de la Marca (PK)</label>
+            <input type="text" id="editNombre" required>
+
+            <label>Cambiar Logo/Imagen</label>
+            <input type="file" id="editFile" accept="image/*">
+            <input type="hidden" id="editImagenUrl">
+            <button type="button" id="btnSubirEditImg" class="btn-upload">Subir Nuevo Logo</button>
+            <div id="editStatus"></div>
+
+            <button type="submit" class="btn-primary">Guardar Cambios</button>
+            <button type="button" class="btn-cancelar" onclick="cerrarEdicion()">Cancelar</button>
+        </form>
+    </section>
+
+    <section class="lista-marcas">
+        <h2>Marcas Registradas</h2>
+        <div id="gridMarcas" class="grid-marcas"></div>
+    </section>
+
+    <section class="brand-form">
+        <h2>Añadir Nueva Marca</h2>
+        <form id="marcaForm">
+            <label>Nombre de la Marca *</label>
+            <input type="text" id="brandNombre" placeholder="Ej: Grefusa, Coca-Cola..." required>
+
+            <label>Imagen de Marca</label>
+            <input type="file" id="brandFile" accept="image/*">
+            <button type="button" id="btnUploadBrandImg" class="btn-upload">1. Subir Imagen</button>
+            
+            <input type="hidden" id="brandImagenUrl">
+            <div id="brandStatus"></div>
+            <img id="brandPreview" class="img-preview" style="display:none;">
+
+            <button type="submit" class="btn-primary" style="margin-top:20px; padding:15px;">2. Guardar Marca en Base de Datos</button>
+        </form>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://gcaknxodxvoshqibskfo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8';
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let todasLasMarcas = [];
+
+        // --- SUBIDA DE IMAGEN ---
+        async function subirImagenMarca(file, btn, status) {
+            if (!file) return alert("Selecciona un archivo");
+            
+            btn.textContent = "Subiendo...";
+            btn.disabled = true;
+
+            const fileName = file.name;
+            const filePath = `${fileName}`; // Se guarda en la raíz del bucket 'Marcas'
+
+            const { data, error } = await _supabase.storage
+                .from('Marcas')
+                .upload(filePath, file, { upsert: true });
+
+            if (error) {
+                status.innerHTML = `<span style="color:red">Error: ${error.message}</span>`;
+                btn.textContent = "Reintentar";
+                btn.disabled = false;
+                return null;
+            }
+
+            const { data: publicData } = _supabase.storage.from('Marcas').getPublicUrl(filePath);
+            btn.textContent = "¡Imagen Lista!";
+            btn.style.background = "#28a745";
+            btn.disabled = false;
+            return publicData.publicUrl;
+        }
+
+        // --- CARGAR DATOS ---
+        async function fetchMarcas() {
+            const { data, error } = await _supabase.from('Marcas').select('*');
+            if (!error) {
+                todasLasMarcas = data;
+                renderizarMarcas(data);
+            }
+        }
+
+        function renderizarMarcas(marcas) {
+            const grid = document.getElementById('gridMarcas');
+            grid.innerHTML = marcas.map(m => `
+                <div class="marca-card">
+                    <img src="${m.imagen || 'https://via.placeholder.com/80'}" class="img-preview">
+                    <strong>${m.nombre}</strong>
+                    <button class="btn-editar" onclick="abrirEditor('${encodeURIComponent(m.nombre)}')">Editar</button>
+                </div>
+            `).join('');
+        }
+
+        // --- EVENTOS AÑADIR ---
+        document.getElementById('btnUploadBrandImg').addEventListener('click', async () => {
+            const file = document.getElementById('brandFile').files[0];
+            const url = await subirImagenMarca(file, document.getElementById('btnUploadBrandImg'), document.getElementById('brandStatus'));
+            if(url) {
+                document.getElementById('brandImagenUrl').value = url;
+                const prev = document.getElementById('brandPreview');
+                prev.src = url; prev.style.display = 'block';
+            }
+        });
+
+        document.getElementById('marcaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('brandNombre').value;
+            const imagen = document.getElementById('brandImagenUrl').value;
+
+            const { error } = await _supabase.from('Marcas').insert([{ nombre, imagen }]);
+            if (!error) {
+                alert("Marca guardada correctamente");
+                location.reload();
+            } else {
+                alert("Error: " + error.message);
+            }
+        });
+
+        // --- EVENTOS EDITAR ---
+        function abrirEditor(nombreCod) {
+            const nombre = decodeURIComponent(nombreCod);
+            const m = todasLasMarcas.find(x => x.nombre === nombre);
+            if(!m) return;
+
+            document.getElementById('editNombreOriginal').value = m.nombre;
+            document.getElementById('editNombre').value = m.nombre;
+            document.getElementById('editImagenUrl').value = m.imagen || '';
+            document.getElementById('editStatus').innerHTML = m.imagen ? `<img src="${m.imagen}" class="img-preview">` : '';
+            
+            document.getElementById('panelEdicion').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        document.getElementById('btnSubirEditImg').addEventListener('click', async () => {
+            const file = document.getElementById('editFile').files[0];
+            const url = await subirImagenMarca(file, document.getElementById('btnSubirEditImg'), document.getElementById('editStatus'));
+            if(url) {
+                document.getElementById('editImagenUrl').value = url;
+                document.getElementById('editStatus').innerHTML = `<img src="${url}" class="img-preview">`;
+            }
+        });
+
+        document.getElementById('formEdicionMarca').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombreOri = document.getElementById('editNombreOriginal').value;
+            const nuevoNombre = document.getElementById('editNombre').value;
+            const nuevaImg = document.getElementById('editImagenUrl').value;
+
+            const { error } = await _supabase.from('Marcas')
+                .update({ nombre: nuevoNombre, imagen: nuevaImg })
+                .eq('nombre', nombreOri);
+
+            if(!error) {
+                alert("Marca actualizada");
+                cerrarEdicion();
+                fetchMarcas();
+            } else {
+                alert("Error: " + error.message);
+            }
+        });
+
+        function cerrarEdicion() { document.getElementById('panelEdicion').style.display = 'none'; }
+
+        // Inicio
+        fetchMarcas();
+    </script>
+</body>
+</html>

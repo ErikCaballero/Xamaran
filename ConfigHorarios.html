@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Configuración de Horarios - Xamaran</title>
+    <link rel="stylesheet" href="Config.css" />
+</head>
+<body>
+
+    <h1>Editar Horarios</h1>
+        <a href="Config.html" class="btn-back">
+            <span>←</span> Volver a Configuración
+        </a><div class="container">
+
+    <section class="schedule-form">
+        <h2>Editar Horarios</h2>
+        <form id="horariosForm">
+            <div id="daysContainer"></div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button type="submit">Guardar horarios</button>
+                <button type="button" id="resetBtn">Limpiar</button>
+            </div>
+        </form>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://cbtvetmvxvxhidsgpcoh.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNidHZldG12eHZ4aGlkc2dwY29oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MzM4NzMsImV4cCI6MjA4NzQwOTg3M30.kphDJaqTCBzHuDSraol0gaDOTMfYf7eHNHaQGy3Ab7o';
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const days = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+        const container = document.getElementById('daysContainer');
+
+        function initHorarios() {
+            container.innerHTML = '';
+            days.forEach((day, i) => {
+                const row = document.createElement('div');
+                row.className = 'day-row';
+                row.innerHTML = `<label>${day}</label><input type="time" id="start-${i}"><span>-</span><input type="time" id="end-${i}">`;
+                container.appendChild(row);
+            });
+        }
+
+        document.getElementById('horariosForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const rows = days.map((day, i) => ({
+                Dia: day,
+                hora: `${document.getElementById(`start-${i}`).value} - ${document.getElementById(`end-${i}`).value}`
+            }));
+            const { error } = await _supabase.from('Horarios').upsert(rows);
+            alert(error ? "Error: " + error.message : "Horarios actualizados");
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => initHorarios());
+
+        initHorarios();
+    </script>
+    
+</body>
+</html>

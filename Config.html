@@ -1,252 +1,126 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Configuración - Xamaran</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Configuración - Xamaran</title>
     <style>
-        /* Estilos Base */
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; margin: 0; }
-        h1, h2 { color: #2c3e50; text-align: center; }
-
-        .schedule-form, .product-form, .preview {
-            max-width: 700px; 
-            margin: 20px auto; 
-            padding: 25px;
-            background: #fff; 
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --accent-color: #6f42c1;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
         }
 
-        .day-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
-        .day-row label { width: 110px; font-weight: 600; color: #444; }
-        .day-row input[type="time"] { flex: 1; padding: 8px; border: 1px solid #ccd1d9; border-radius: 6px; }
-
-        .product-form label { display: block; margin-top: 15px; font-weight: 600; font-size: 0.95em; }
-        .product-form input, .product-form select, .product-form textarea {
-            width: 100%; padding: 12px; margin-top: 6px;
-            box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px;
-            font-size: 14px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        
-        .small-row { display: flex; gap: 15px; align-items: flex-end; margin-top: 10px; }
-        .col { flex: 1; }
 
-        button {
-            cursor: pointer; padding: 12px 20px; border-radius: 6px;
-            border: none; font-weight: bold; transition: all 0.2s ease;
+        .config-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            padding: 40px 0;
         }
-        button[type="submit"], .btn-primary { background: #6f42c1; color: white; }
-        button[type="submit"]:hover, .btn-primary:hover { background: #5a32a3; transform: translateY(-1px); }
-        #resetBtn { background: #dc3545; color: white; margin-left: 10px; }
 
-        .msg { padding: 15px; border-radius: 6px; margin-top: 20px; display: none; font-size: 0.9em; }
-        .msg.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .msg.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .menu-item {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        #imgPreview { max-width: 180px; margin-top: 15px; border-radius: 8px; display: none; border: 2px solid #eee; }
-        #prodImgUrlDisplay { 
-            font-size: 0.8em; word-break: break-all; color: #666; 
-            background: #f8f9fa; padding: 8px; border-radius: 6px; 
-            margin-top: 12px; border: 1px solid #eee; 
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .menu-item img {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            object-fit: contain;
+            /* Filtro opcional para dar color corporativo si son iconos negros */
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .menu-item h3 {
+            margin: 10px 0;
+            color: var(--text-main);
+            font-size: 1.25rem;
+        }
+
+        .menu-item p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive para que la 5ta sección se centre si queda sola */
+        @media (min-width: 900px) {
+            .config-menu {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .menu-item:last-child:nth-child(3n-1) {
+                grid-column: span 2; /* Ajuste si quieres que ocupen distinto */
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>Panel de Configuración Xamaran</h1>
+    <nav class="config-menu">
+        <a href="ConfigProductos.html" class="menu-item">
+            <img src="https://cdn-icons-png.flaticon.com/512/1170/1170577.png" alt="Productos">
+            <h3>Gestión de Productos</h3>
+            <p>Añade, edita o elimina artículos de tu catálogo y organiza sus categorías.</p>
+        </a>
 
-    <section class="product-form">
-        <h2>Añadir Nuevo Producto</h2>
-        <form id="productoForm">
-            <label for="prodNombre">Nombre del producto *</label>
-            <input type="text" id="prodNombre" placeholder="Ej: Jumpers de Queso" required>
+        <a href="ConfigHorarios.html" class="menu-item">
+            <img src="https://cdn-icons-png.flaticon.com/512/2784/2784459.png" alt="Horarios">
+            <h3>Gestión de Horarios</h3>
+            <p>Aquí se configuran los horarios de apertura y cierre de tu tienda.</p>
+        </a>
 
-            <div class="small-row">
-                <div class="col">
-                    <label for="prodPrecio">Precio (€) *</label>
-                    <input type="number" id="prodPrecio" step="0.01" min="0" required>
-                </div>
-                <div class="col">
-                    <label for="prodCategoria">Categoría *</label>
-                    <select id="prodCategoria" required></select>
-                </div>
-            </div>
+        <a href="ConfigMarcas.html" class="menu-item">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Marcas">
+            <h3>Gestión de Marcas</h3>
+            <p>Añadir y gestionar las marcas de tus productos.</p>
+        </a>
 
-            <label for="newCategoria">¿Falta una categoría?</label>
-            <div class="small-row">
-                <input type="text" id="newCategoria" placeholder="Nombre de categoría..." class="col">
-                <button type="button" id="btnAddCategoria" style="background: #28a745; color: white;">Añadir</button>
-            </div>
+        
+        <a href="ConfigNoticias.html" class="menu-item">
+            <h3>Configuración de Noticias</h3>
+            <img src="https://cdn-icons-png.flaticon.com/512/2897/2897785.png" alt="Stock">
+            <p>Añade las noticias al apartado de Noticias de la web.</p>
+        </a>
 
-            <label for="prodDesc">Descripción (Opcional)</label>
-            <textarea id="prodDesc" rows="2" placeholder="Ej: Snacks horneados..."></textarea>
+        <a href="ConfigGeneral.html" class="menu-item">
+            <img src="https://cdn-icons-png.flaticon.com/512/3953/3953226.png" alt="Ajustes">
+            <h3>Configuración General</h3>
+            <p>Ajustes del sistema, notificaciones y preferencias de la cuenta.</p>
+        </a>
+    </nav>
 
-            <label for="prodMarca">Marca (Opcional)</label>
-            <input type="text" id="prodMarca" placeholder="Ej: Grefusa">
-
-            <label>Imagen del producto (Opcional)</label>
-            <input type="file" id="prodImagen" accept="image/*">
-            <div class="small-row">
-                <button type="button" id="btnUploadProdImg" class="btn-primary">1. Subir Imagen</button>
-            </div>
-            
-            <div id="prodImgUrlDisplay">La URL aparecerá aquí si subes una imagen.</div>
-            <img id="imgPreview" src="" alt="Vista previa">
-            <input type="hidden" id="prodImagenUrl">
-
-            <div style="margin-top: 30px;">
-                <button type="submit" style="width: 100%; font-size: 1.1em; padding: 15px;">2. Guardar Producto en Base de Datos</button>
-            </div>
-
-            <div id="productoMsg" class="msg"></div>
-        </form>
-    </section>
-
-    <section class="schedule-form">
-        <h2>Editar Horarios</h2>
-        <form id="horariosForm">
-            <div id="daysContainer"></div>
-            <div style="text-align: right; margin-top: 20px;">
-                <button type="submit">Guardar horarios</button>
-                <button type="button" id="resetBtn">Limpiar</button>
-            </div>
-        </form>
-    </section>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const SUPABASE_URL = 'https://gcaknxodxvoshqibskfo.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8';
-        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        let categoriasBase = ['Snacks', 'Chocolates', 'Chuches', 'Bebidas', 'Helados', 'Frutos Secos', 'Galletas', 'Varios'];
-        const selectCat = document.getElementById('prodCategoria');
-
-        function cargarCategorias() {
-            selectCat.innerHTML = '<option value="" disabled selected>Selecciona una categoría...</option>';
-            categoriasBase.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat;
-                selectCat.appendChild(opt);
-            });
-        }
-
-        document.getElementById('btnAddCategoria').addEventListener('click', () => {
-            const nueva = document.getElementById('newCategoria').value.trim();
-            if(nueva && !categoriasBase.includes(nueva)) {
-                categoriasBase.push(nueva);
-                cargarCategorias();
-                selectCat.value = nueva;
-                document.getElementById('newCategoria').value = '';
-            }
-        });
-
-        const btnSubirImg = document.getElementById('btnUploadProdImg');
-        const fileInput = document.getElementById('prodImagen');
-        const urlDisplay = document.getElementById('prodImgUrlDisplay');
-        const imgPreview = document.getElementById('imgPreview');
-        const inputUrlOculto = document.getElementById('prodImagenUrl');
-
-        btnSubirImg.addEventListener('click', async () => {
-            const file = fileInput.files[0];
-            const categoria = selectCat.value;
-
-            if (!categoria) return alert("Selecciona primero una categoría para organizar la carpeta.");
-            if (!file) return alert("Selecciona un archivo de imagen.");
-
-            btnSubirImg.textContent = "Subiendo...";
-            btnSubirImg.disabled = true;
-            
-            const filePath = `${categoria}/${file.name}`; 
-
-            const { data, error } = await _supabase.storage
-                .from('productos')
-                .upload(filePath, file, { upsert: true });
-
-            if (error) {
-                urlDisplay.textContent = "Error: " + error.message;
-                btnSubirImg.textContent = "Reintentar";
-                btnSubirImg.disabled = false;
-            } else {
-                const { data: publicData } = _supabase.storage.from('productos').getPublicUrl(filePath);
-                // Guardar sólo el nombre original del archivo (antes de subirse)
-                inputUrlOculto.value = file.name;
-                urlDisplay.textContent = "URL: " + publicData.publicUrl;
-                imgPreview.src = publicData.publicUrl;
-                imgPreview.style.display = "block";
-                btnSubirImg.textContent = "¡Subida con éxito!";
-                btnSubirImg.style.background = "#28a745";
-                btnSubirImg.disabled = false;
-            }
-        });
-
-        const prodForm = document.getElementById('productoForm');
-        prodForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const msg = document.getElementById('productoMsg');
-
-            const datos = {
-                nombre: document.getElementById('prodNombre').value,
-                precio: parseFloat(document.getElementById('prodPrecio').value),
-                categoria: selectCat.value,
-                Descripcion: document.getElementById('prodDesc').value,
-                marca: document.getElementById('prodMarca').value, // Nuevo campo
-                imagen: inputUrlOculto.value || null
-            };
-
-            const { error } = await _supabase.from('productos').insert([datos]);
-
-            if (error) {
-                mostrarMensaje(msg, "Error en BD: " + error.message, "error");
-            } else {
-                mostrarMensaje(msg, "¡Producto guardado correctamente!", "success");
-                resetearFormulario();
-            }
-        });
-
-        const days = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
-        const container = document.getElementById('daysContainer');
-
-        function initHorarios() {
-            container.innerHTML = '';
-            days.forEach((day, i) => {
-                const row = document.createElement('div');
-                row.className = 'day-row';
-                row.innerHTML = `<label>${day}</label><input type="time" id="start-${i}"><span>-</span><input type="time" id="end-${i}">`;
-                container.appendChild(row);
-            });
-        }
-
-        document.getElementById('horariosForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const rows = days.map((day, i) => ({
-                Dia: day,
-                hora: `${document.getElementById(`start-${i}`).value} - ${document.getElementById(`end-${i}`).value}`
-            }));
-            const { error } = await _supabase.from('Horarios').upsert(rows);
-            alert(error ? "Error: " + error.message : "Horarios actualizados");
-        });
-
-        function mostrarMensaje(el, texto, tipo) {
-            el.textContent = texto;
-            el.className = `msg ${tipo}`;
-            el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 5000);
-        }
-
-        function resetearFormulario() {
-            prodForm.reset();
-            inputUrlOculto.value = '';
-            imgPreview.style.display = "none";
-            btnSubirImg.textContent = "1. Subir Imagen";
-            btnSubirImg.style.background = "#6f42c1";
-            urlDisplay.textContent = "La URL aparecerá aquí si subes una imagen.";
-        }
-
-        cargarCategorias();
-        initHorarios();
-    </script>
 </body>
 </html>
