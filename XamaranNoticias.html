@@ -101,16 +101,14 @@
     
     <section>
       <h2>Lo más nuevo</h2>
-      <div id="grid-novedades" class="news-grid">
-        </div>
+      <div id="grid-novedades" class="news-grid"></div>
     </section>
 
     <hr>
 
     <section>
       <h2>Archivo de Noticias</h2>
-      <div id="grid-general" class="news-grid">
-        </div>
+      <div id="grid-general" class="news-grid"></div>
     </section>
 
   </div>
@@ -134,9 +132,9 @@
         return;
       }
 
-      // Separamos las 3 primeras para "Novedades" y el resto para "General"
-      const novedades = noticias.slice(0, 3);
-      const resto = noticias.slice(3);
+      // MODIFICADO: Filtramos dinámicamente según la columna booleana 'es_novedad'
+      const novedades = noticias.filter(noticia => noticia.es_novedad === true);
+      const resto = noticias.filter(noticia => noticia.es_novedad !== true);
 
       renderizarSeccion(novedades, 'grid-novedades', true);
       renderizarSeccion(resto, 'grid-general', false);

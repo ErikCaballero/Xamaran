@@ -7,6 +7,107 @@
   <link rel="shortcut icon" href="img/XamaranLogo.png" type="image/x-icon">
   <link rel="stylesheet" href="General.css">
   <link rel="stylesheet" href="Productos.css">
+  <style>
+    /* Estilos específicos y discretos para la sección de marcas */
+    .marcas-header-container {
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      margin-bottom: 5px;
+      border-bottom: 2px solid #f0f0f0; /* Línea sutil divisoria */
+      padding-bottom: 8px;
+    }
+
+    /* El título ocupa el espacio central de manera forzada */
+    .marcas-header-container h3 {
+      font-size: 1.1rem;
+      color: #666;
+      margin: 0;
+      flex-grow: 1;
+      text-align: center;
+      /* Compensamos el tamaño del botón para que el título esté en el centro perfecto */
+      padding-left: 80px; 
+    }
+    
+    /* Botón colorido al estilo de la web y alineado a la derecha */
+    .btn-toggle-marcas {
+      background: #ff4081; /* Rosa vibrante estilo chuches/dulces */
+      color: #ffffff;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 6px 14px;
+      border-radius: 20px; /* Bordes muy redondeados e infantiles/alegres */
+      box-shadow: 0 3px 6px rgba(255, 64, 129, 0.2);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      min-width: 80px; /* Tamaño mínimo para cuadrar la simetría */
+    }
+    .btn-toggle-marcas:hover {
+      background: #e91e63; /* Tono ligeramente más oscuro al pasar el cursor */
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(255, 64, 129, 0.3);
+    }
+    .btn-toggle-marcas:active {
+      transform: translateY(1px);
+    }
+    
+    .marcas-wrapper-collapsible {
+      max-height: 500px; 
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+      opacity: 1;
+    }
+    .marcas-wrapper-collapsible.collapsed {
+      max-height: 0 !important;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .marcas-discretas-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      padding: 10px 0;
+    }
+    .marca-item {
+      background-color: #f9f9f9;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      width: 100px;
+      height: 50px;
+    }
+    .marca-item:hover {
+      background-color: #ffffff;
+      border-color: #b5b5b5;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .marca-item img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: grayscale(20%);
+      transition: filter 0.2s ease;
+    }
+    .marca-item:hover img {
+      filter: grayscale(0%);
+    }
+
+    /* Ajuste responsivo para pantallas pequeñas */
+    @media (max-width: 480px) {
+      .marcas-header-container h3 {
+        padding-left: 0;
+      }
+    }
+  </style>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
       (function() {
@@ -41,8 +142,17 @@
     <div class="modal-form">
       <label for="cliente-nombre">Tu nombre</label>
       <input id="cliente-nombre" type="text" placeholder="Tu nombre">
+      
       <label for="cliente-email">Tu email</label>
       <input id="cliente-email" type="email" placeholder="tunombre@ejemplo.com">
+
+      <!-- NUEVO: Campo de Teléfono -->
+      <label for="cliente-telefono">Número de teléfono</label>
+      <input id="cliente-telefono" type="tel" placeholder="Ej: 612345678">
+
+      <!-- NUEVO: Campo de Observaciones -->
+      <label for="cliente-observaciones">Observaciones / Notas del pedido</label>
+      <textarea id="cliente-observaciones" rows="3" placeholder="Ej: Alergias, indicaciones de entrega, cantidad de bolsas para el cumpleaños etc."></textarea>
     </div>
     <div class="modal-actions">
       <button class="secondary" onclick="document.getElementById('carrito-modal').style.display='none'">Seguir comprando</button>
@@ -61,7 +171,7 @@
     <h2>Categorías de Productos</h2>
     <section class="grid">
       <div class="paquete" id="menupatatas">
-      <img class="imagenpaquete" src="https://www.lays.es/prod/s3fs-public/2025-03/Lays_Sal_3D_pack.png" alt="Paquete de snack">
+      <img class="imagenpaquete" src="img/Snacks.png" alt="Paquete de snack">
       <span class="paquete-label">Snacks</span>
     </div>
       <div class="paquete" id="menuchocolate">
@@ -90,7 +200,7 @@
     </div>
     <div class="paquete" id="menufrutossecos">
       <img class="imagenfrutoseco1" src="img/cacahuete.png" alt="Cacahuete">
-      <img class="imagenfrutoseco2" src="img/Almendra.png" alt="Almendra">
+      <img class="imagenfrutoseco2" src="img/almendra.png" alt="Almendra">
       <img class="imagenfrutoseco3" src="img/pistacho.png" alt="Pistacho">
       <img class="imagenfrutoseco4" src="img/pipa.png" alt="Pipas">
       <span class="paquete-label">Frutos Secos</span>
@@ -106,11 +216,23 @@
     </div>
     </section>
     <div class="paquete" id="menuotros">
-      <img class="imagenlata" src="img/latacocacola1.png" alt="Lata de cocalola cerrada">
-      <img class="imagenlata" src="img/.png" alt="Lata de cocalola abierta">
+      <img class="imagenlata" src="img/Bollo.png" alt="Lata de cocalola cerrada">
       <span class="paquete-label">Varios</span>
     </div>
+  </div>
+
+  <!-- SECCIÓN DE MARCAS: Título centrado y botón a la extrema derecha -->
+  <div class="section-block" style="padding: 10px 0;">
+    <div class="marcas-header-container">
+      <h3>Filtrar por Marca</h3>
+      <button id="btn-colapsar-marcas" class="btn-toggle-marcas">Ocultar</button>
+    </div>
     
+    <div class="marcas-wrapper-collapsible" id="wrapper-marcas">
+      <div class="marcas-discretas-grid" id="contenedor-marcas">
+        <!-- Aquí se insertarán las marcas desde JavaScript -->
+      </div>
+    </div>
   </div>
 
   <div class="section-block">
@@ -122,7 +244,6 @@
 
     <section class="grid" id="contenedor-productos">
       <!-- Aquí se insertarán los productos desde JavaScript -->
-      
     </section>
   </div>
 
@@ -365,6 +486,7 @@
 
     let todosLosProductos = [];
     const contenedorProductos = document.getElementById('contenedor-productos');
+    const contenedorMarcas = document.getElementById('contenedor-marcas');
     const inputBuscador = document.getElementById('buscador-nombre');
 
     const mapaCategorias = {
@@ -390,7 +512,6 @@
 
       productosParaMostrar.forEach(producto => {
         const desc = producto.Descripcion || ""; 
-        // CAMBIO: Number().toFixed(2) para los decimales
         const precioFormateado = Number(producto.precio).toFixed(2);
 
         const card = document.createElement('div');
@@ -411,16 +532,61 @@
     async function cargarProductos() {
       const { data, error } = await supabaseClient
         .from('productos')
-        .select('nombre, precio, categoria, Descripcion, imagen')
+        .select('nombre, precio, categoria, Descripcion, imagen, ocultar, marca') 
         .order('nombre', { ascending: true }); 
 
       if (error) {
-        console.error('Error:', error.message);
+        console.error('Error cargando productos:', error.message);
         return;
       }
 
-      todosLosProductos = data;
+      todosLosProductos = data.filter(producto => producto.ocultar !== true);
       renderizarProductos(todosLosProductos); 
+    }
+
+    async function cargarMarcas() {
+      if (!contenedorMarcas) return;
+
+      const { data, error } = await supabaseClient
+        .from('Marcas')
+        .select('nombre, imagen, ocultar')
+        .order('nombre', { ascending: true });
+
+      if (error) {
+        console.error('Error cargando marcas:', error.message);
+        return;
+      }
+
+      const marcasVisibles = data.filter(marca => marca.ocultar !== true);
+      contenedorMarcas.innerHTML = '';
+
+      if (marcasVisibles.length === 0) {
+        contenedorMarcas.innerHTML = '<p style="text-align: center; color: #999; font-size: 0.9rem;">No hay marcas disponibles.</p>';
+        return;
+      }
+
+      marcasVisibles.forEach(marca => {
+        const itemMarcas = document.createElement('div');
+        itemMarcas.className = 'marca-item'; 
+        itemMarcas.title = marca.nombre;
+
+        const img = document.createElement('img');
+        img.src = marca.imagen || 'img/placeholder.png';
+        img.alt = marca.nombre;
+
+        itemMarcas.appendChild(img);
+
+        itemMarcas.addEventListener('click', () => {
+          inputBuscador.value = ""; 
+          const filtrados = todosLosProductos.filter(prod => 
+            prod.marca && prod.marca.trim().toLowerCase() === marca.nombre.trim().toLowerCase()
+          );
+          renderizarProductos(filtrados);
+          contenedorProductos.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        contenedorMarcas.appendChild(itemMarcas);
+      });
     }
 
     // EVENTO: Búsqueda por nombre
@@ -437,7 +603,7 @@
       paquete.addEventListener('click', () => {
         const nombreCategoriaDB = mapaCategorias[paquete.id];
         if (nombreCategoriaDB) {
-          inputBuscador.value = ""; // Limpiamos buscador al elegir categoría
+          inputBuscador.value = ""; 
           const filtrados = todosLosProductos.filter(prod => 
             prod.categoria && prod.categoria.trim() === nombreCategoriaDB
           );
@@ -447,7 +613,22 @@
       });
     });
 
-    document.addEventListener('DOMContentLoaded', cargarProductos);
+    // CONTROLADOR DE COLAPSO: Cambia el texto dinámicamente manteniendo el estilo limpio
+    document.getElementById('btn-colapsar-marcas').addEventListener('click', function() {
+      const wrapper = document.getElementById('wrapper-marcas');
+      wrapper.classList.toggle('collapsed');
+      
+      if (wrapper.classList.contains('collapsed')) {
+        this.textContent = 'Mostrar';
+      } else {
+        this.textContent = 'Ocultar';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarProductos();
+      cargarMarcas();
+    });
   </script>
   
 </body>

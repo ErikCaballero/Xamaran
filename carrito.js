@@ -150,34 +150,62 @@ function finalizarCompra(){
     alert('El carrito está vacío. Añade productos antes de finalizar.');
     return;
   }
-  // recoger datos del formulario
+  
+  // Recoger datos del formulario
   const nameEl = document.getElementById('cliente-nombre');
   const emailEl = document.getElementById('cliente-email');
+  const tlfEl = document.getElementById('cliente-telefono');
+  const obsEl = document.getElementById('cliente-observaciones');
+
   const clienteNombre = nameEl ? nameEl.value.trim() : '';
   const clienteEmail = emailEl ? emailEl.value.trim() : '';
+  const clienteTelefono = tlfEl ? tlfEl.value.trim() : '';
+  const clienteObservaciones = obsEl ? obsEl.value.trim() : 'Ninguna';
 
-  if (!clienteNombre) { alert('Introduce tu nombre.'); if(nameEl) nameEl.focus(); return; }
+  // 1. VALIDACIÓN: El nombre siempre es obligatorio
+  if (!clienteNombre) { 
+    alert('Introduce tu nombre.'); 
+    if(nameEl) nameEl.focus(); 
+    return; 
+  }
+  
+  // Expresión regular para validar el correo
   const emailRegex = /^\S+@\S+\.\S+$/;
-  if (!clienteEmail || !emailRegex.test(clienteEmail)) { alert('Introduce un correo válido.'); if(emailEl) emailEl.focus(); return; }
+  
+  // Comprobamos si los campos individuales son válidos de forma independiente
+  const esEmailValido = clienteEmail && emailRegex.test(clienteEmail);
+  const esTelefonoValido = clienteTelefono && clienteTelefono.length >= 9;
 
+  // 2. VALIDACIÓN CONDICIONAL: Debe haber al menos un método de contacto válido
+  if (!esEmailValido && !esTelefonoValido) {
+    alert('Por favor, introduce al menos un método de contacto válido (un Correo electrónico correcto o un Número de teléfono de mínimo 9 dígitos).');
+    
+    // Enfocamos el email por defecto para ayudar al usuario
+    if (emailEl) emailEl.focus(); 
+    return; 
+  }
+
+  // Si pasa el filtro anterior, procedemos con la confirmación
   if (!confirm('¿Deseas enviar el pedido a la tienda?')) return;
 
   const precioTotal = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0).toFixed(2);
   const itemsPlain = carrito.map(it => `${it.nombre} x${it.cantidad} — ${(it.precio * it.cantidad).toFixed(2)} €`).join('\n');
 
-  // templateParams — ajusta los nombres según tu plantilla en EmailJS
+  // Si alguno de los campos no es válido pero el otro sí (por ejemplo, dejaron el email vacío pero pusieron teléfono),
+  // enviamos un texto aclaratorio a la plantilla de EmailJS para que no quede raro en el correo.
   const templateParams = {
     to_name: 'Tienda Xamaran',
     from_name: clienteNombre,
-    from_email: clienteEmail,
+    from_email: esEmailValido ? clienteEmail : 'No proporcionado',
     client_name: clienteNombre,
-    client_email: clienteEmail,
+    client_email: esEmailValido ? clienteEmail : 'No proporcionado',
+    client_phone: esTelefonoValido ? clienteTelefono : 'No proporcionado',
+    observations: clienteObservaciones,
     items: itemsPlain,
     total: `${precioTotal} €`,
     timestamp: new Date().toLocaleString()
   };
 
-  // Reemplaza 'YOUR_SERVICE_ID' y 'YOUR_TEMPLATE_ID' por los valores de EmailJS
   if (typeof emailjs === 'undefined'){
     alert('EmailJS no está cargado. Añade el script de EmailJS y tu user ID en el HTML.');
     return;
@@ -186,13 +214,19 @@ function finalizarCompra(){
   emailjs.send('service_ppc0l1c','template_a25b6vo', templateParams)
     .then(function(response){
       alert('Pedido solicitado a la tienda. Gracias.');
-      // limpiar carrito tras enviar
+      
+      // Limpiar el carrito e inputs tras enviar con éxito
       carrito = [];
       if (nameEl) nameEl.value = '';
       if (emailEl) emailEl.value = '';
+      if (tlfEl) tlfEl.value = '';
+      if (obsEl) obsEl.value = '';
+      
       actualizarInterfazCarrito();
-      // cerrar modal si está abierto
-      const modal = document.getElementById('carrito-modal'); if (modal) modal.style.display = 'none';
+      
+      // Cerrar modal
+      const modal = document.getElementById('carrito-modal'); 
+      if (modal) modal.style.display = 'none';
     }, function(error){
       console.error('EmailJS error:', error);
       alert('Error al enviar el pedido. Intenta de nuevo más tarde.');

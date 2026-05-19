@@ -9,20 +9,22 @@
 <body>
 
     <h1>Editar Horarios</h1>
-        <a href="Config.html" class="btn-back">
-            <span>←</span> Volver a Configuración
-        </a><div class="container">
-
-    <section class="schedule-form">
-        <h2>Editar Horarios</h2>
-        <form id="horariosForm">
-            <div id="daysContainer"></div>
-            <div style="text-align: right; margin-top: 20px;">
-                <button type="submit">Guardar horarios</button>
-                <button type="button" id="resetBtn">Limpiar</button>
-            </div>
-        </form>
-    </section>
+    <a href="Config.html" class="btn-back">
+        <span>←</span> Volver a Configuración
+    </a>
+    
+    <div class="container">
+        <section class="schedule-form">
+            <h2>Editar Horarios</h2>
+            <form id="horariosForm">
+                <div id="daysContainer"></div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="submit">Guardar horarios</button>
+                    <button type="button" id="resetBtn">Limpiar</button>
+                </div>
+            </form>
+        </section>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -33,6 +35,7 @@
         const days = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
         const container = document.getElementById('daysContainer');
 
+        // Genera la estructura vacía del formulario
         function initHorarios() {
             container.innerHTML = '';
             days.forEach((day, i) => {
@@ -43,19 +46,70 @@
             });
         }
 
+        // NUEVO: Descarga los datos de Supabase y los inyecta en los inputs (Vista previa)
+        async function cargarHorariosPrevia() {
+            initHorarios(); // Primero creamos los inputs vacíos
+
+            const { data: horarios, error } = await _supabase
+                .from('Horarios')
+                .select('*');
+
+            if (error) {
+                console.error("Error al cargar la vista previa de horarios:", error.message);
+                return;
+            }
+
+            if (horarios && horarios.length > 0) {
+                horarios.forEach(registro => {
+                    // Buscamos en qué posición del array 'days' está el día de la base de datos
+                    const index = days.indexOf(registro.Dia);
+                    
+                    if (index !== -1 && registro.hora) {
+                        // Separamos el string "10:00 - 20:00" en ["10:00", "20:00"]
+                        const partesHora = registro.hora.split(' - ');
+                        
+                        if (partesHora.length === 2) {
+                            const startInput = document.getElementById(`start-${index}`);
+                            const endInput = document.getElementById(`end-${index}`);
+                            
+                            if (startInput) startInput.value = partesHora[0].trim();
+                            if (endInput) endInput.value = partesHora[1].trim();
+                        }
+                    }
+                });
+            }
+        }
+
+        // Manejador del envío del formulario (Guarda o actualiza)
         document.getElementById('horariosForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const rows = days.map((day, i) => ({
-                Dia: day,
-                hora: `${document.getElementById(`start-${i}`).value} - ${document.getElementById(`end-${i}`).value}`
-            }));
+            const rows = days.map((day, i) => {
+                const startVal = document.getElementById(`start-${i}`).value;
+                const endVal = document.getElementById(`end-${i}`).value;
+                
+                // Si ambos campos están vacíos, guardamos una cadena vacía o indicación de cerrado
+                const horaString = (startVal && endVal) ? `${startVal} - ${endVal}` : '';
+
+                return {
+                    Dia: day,
+                    hora: horaString
+                };
+            });
+
+            // Usamos upsert. Recuerda que para que actualice correctamente en base al día,
+            // la columna 'Dia' debería estar configurada como clave primaria o índice único en Supabase.
             const { error } = await _supabase.from('Horarios').upsert(rows);
-            alert(error ? "Error: " + error.message : "Horarios actualizados");
+            alert(error ? "Error: " + error.message : "Horarios actualizados con éxito");
+            
+            // Recargamos la vista previa por seguridad
+            cargarHorariosPrevia();
         });
 
-        document.getElementById('resetBtn').addEventListener('click', () => initHorarios());
+        // Botón de limpiar restablece los inputs y vuelve a traer lo que hay en la BD
+        document.getElementById('resetBtn').addEventListener('click', () => cargarHorariosPrevia());
 
-        initHorarios();
+        // Ejecución inicial automática al cargar el DOM
+        document.addEventListener('DOMContentLoaded', cargarHorariosPrevia);
     </script>
     
 </body>

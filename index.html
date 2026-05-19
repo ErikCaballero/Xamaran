@@ -39,8 +39,6 @@
     <h2>La tienda de chuches más colorida del barrio</h2>
   </section>
 
-  
-
   <section class="productos" id="productos">
     <div class="producto">
       <img src="img/Chuches.png" alt="Chuches surtidas" />
@@ -59,12 +57,15 @@
     </div>
   </section>
 
+  <!-- MODIFICADO: Se añade la alerta y redirección nativa en el botón onclick -->
   <section class="personaliza-bolsa" aria-labelledby="titulo-personaliza">
     <img src="img/BolsasChuches.png" alt="Personaliza tu bolsa" />
     <div class="personaliza-content">
       <h3 id="titulo-personaliza">¡Personaliza tu bolsa de cumpleaños!</h3>
       <p>Selecciona las chuches que quieres incluir en tu bolsa personalizada. ¿Alguna alergia? Coméntanoslo y seleccionaremos las chuches meticulosamente para que no haya ningún problema y todos disfruten del cumpleaños.</p>
-      <a href="XamaranProductos.html"><button class="btn-seleccionar">Seleccionar chuches</button></a>
+      <button class="btn-seleccionar" onclick="alert('Recuerde especificar la cantidad de bolsas de productos que desea en el apartado de observaciones del formulario del carrito'); window.location.href='XamaranProductos.html';">
+        Seleccionar chuches
+      </button>
     </div>
   </section>
 
@@ -90,7 +91,7 @@
         <li>Teléfono de contacto.</li>
         <li>Los pagos se realizaran por Bizum (633618668) antes de la entrega</li>
         <li>Pedido mínimo en Mungia (Zona local) 5 €.</li>
-        <li>Pedido mínimo resto de poblaciones (Atxuri, Laukariz, Zabalondo,    Larrauri, Meñaka, Maruri, Gatika, Trobika, Markaida, Gamiz-Fika, Gamiz, Fika) 8 €.</li>
+        <li>Pedido mínimo resto de poblaciones (Atxuri, Laukariz, Zabalondo, Larrauri, Meñaka, Maruri, Gatika, Trobika, Markaida, Gamiz-Fika, Gamiz, Fika) 8 €.</li>
         <li><span><b>Recepción</b></span> de pedidos de 10:00 hasta las 20:00.</li>
         <li><span><b>Reparto</b></span> de pedidos de 20:00 a 22:00.</li>
         <li>Recordar Domingos <span style="font-weight: bold; color: red;">CERRADO</span></li>
@@ -138,13 +139,13 @@
       el.style.transform = 'translate(-50%,-50%) rotate(' + (Math.random()*360) + 'deg)';
       container.appendChild(el);
 
-      const angle = Math.random() * Math.PI * 2; // full circle
-      const speed = 200 + Math.random()*400; // px per second
+      const angle = Math.random() * Math.PI * 2; 
+      const speed = 200 + Math.random()*400; 
       const vx = Math.cos(angle) * speed;
       const vy = Math.sin(angle) * speed;
       const rotation = Math.random()*360;
-      const rotationSpeed = (Math.random()*600 - 300); // deg/sec
-      const life = 1200 + Math.random()*900; // ms
+      const rotationSpeed = (Math.random()*600 - 300); 
+      const life = 1200 + Math.random()*900; 
 
       const p = { el, x:0, y:0, vx, vy, rotation, rotationSpeed, birth: performance.now(), life };
       particles.push(p);
@@ -161,18 +162,17 @@
 
     function animate(){
       const now = performance.now();
-      const gravity = 900; // px/s^2
+      const gravity = 900; 
       let i = particles.length;
       while(i--){
         const p = particles[i];
-        const t = (now - p.birth)/1000; // seconds
+        const t = (now - p.birth)/1000; 
         if(t*1000 > p.life){
           p.el.remove();
           particles.splice(i,1);
           continue;
         }
         const dt = 1/60;
-        // simple physics integration
         p.vy = p.vy + gravity * dt;
         p.x += p.vx * dt;
         p.y += p.vy * dt;
@@ -193,8 +193,12 @@
       spawnBurst();
     });
 
-    // also allow click to trigger
-    container.addEventListener('click', ()=> spawnBurst());
+    // Se detiene la propagación del clic en el contenedor si se pulsa específicamente el botón de seleccionar
+    container.addEventListener('click', (e)=> {
+      if(!e.target.classList.contains('btn-seleccionar')) {
+        spawnBurst();
+      }
+    });
   })();
   </script>
   <script>
@@ -207,7 +211,6 @@
     function openModal(){
       modal.classList.add('open');
       modal.setAttribute('aria-hidden','false');
-      // trap focus could be added here
     }
     function closeModal(){
       modal.classList.remove('open');

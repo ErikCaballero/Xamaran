@@ -29,7 +29,40 @@
         .producto-card {
             border: 1px solid #ddd; padding: 15px; border-radius: 8px;
             background: #fff; text-align: center;
+            transition: all 0.3s ease;
         }
+        /* Estilo para productos ocultos */
+        .producto-oculto {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+            opacity: 0.85;
+        }
+        .producto-oculto h3, .producto-oculto p {
+            color: #6c757d;
+        }
+        
+        .ocultar-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+            font-size: 0.95em;
+            color: #495057;
+            cursor: pointer;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+
+        .producto-id {
+            font-size: 0.8em;
+            color: #6c757d;
+            display: block;
+            margin-bottom: 10px;
+        }
+
         .btn-editar {
             background: #ffc107; color: #000; border: none;
             padding: 8px 15px; cursor: pointer; border-radius: 5px;
@@ -68,15 +101,6 @@
             border-color: var(--primary);
         }
 
-        .btn-back i {
-            font-size: 1.2em;
-            transition: transform 0.3s ease;
-        }
-
-        .btn-back:hover i {
-            transform: scale(1.2);
-        }
-        
         #btnAddProduct {
             display: inline-flex;
             align-items: center;
@@ -105,10 +129,6 @@
             box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
             filter: brightness(1.1);
         }
-
-        #btnAddProduct:active {
-            transform: scale(0.98);
-        }
     </style>
 </head>
 <body>
@@ -116,12 +136,14 @@
     <h1>Panel de Configuración Xamaran</h1>
         <a href="Config.html" class="btn-back">
             <span>←</span> Volver a Configuración
-        </a><div class="container">
+        </a>
+        <div class="container">
             
         <section id="panelEdicion">
         <h2>Editar Producto</h2>
         <form id="formEdicion">
-            <input type="hidden" id="editNombreOriginal">
+            <!-- Usamos el ID como Primary Key oculto -->
+            <input type="hidden" id="editId">
             
             <label for="editNombre">Nombre del producto *</label>
             <input type="text" id="editNombre" required>
@@ -211,7 +233,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://gcaknxodxvoshqibskfo.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8'; // Asegúrate de usar tu clave correcta
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjYWtueG9keHZvc2hxaWJza2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MTc4MzgsImV4cCI6MjA5Mzk5MzgzOH0.ME-KRUmvswBeNMywF25dEG4wzz6QoWg0F5S64gy8cd8'; 
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let categoriasBase = ['Snacks', 'Chocolates', 'Chuches', 'Bebidas', 'Helados', 'Frutos Secos', 'Galletas', 'Varios'];
@@ -229,7 +251,6 @@
             });
         }
 
-        // --- FUNCIÓN ÚNICA PARA SUBIR IMÁGENES ---
         async function subirImagenGenerica(file, categoria, btnElement, statusElement) {
             if (!file || !categoria) {
                 alert("Falta archivo o categoría");
@@ -240,7 +261,7 @@
             btnElement.disabled = true;
 
             const fileExt = file.name.split('.').pop();
-            const fileName = file.name; // Usar el nombre original del archivo seleccionado
+            const fileName = file.name; 
             const filePath = `${categoria}/${fileName}`;
 
             const { data, error } = await _supabase.storage
@@ -257,12 +278,11 @@
             btnElement.textContent = "¡Subido!";
             btnElement.style.background = "#28a745";
             btnElement.disabled = false;
-            // Obtener la URL pública y retornarla
+            
             const { data: publicData } = _supabase.storage.from('productos').getPublicUrl(filePath);
             return publicData && publicData.publicUrl ? publicData.publicUrl : fileName;
         }
 
-        // --- LOGICA DE PRODUCTOS ---
         async function fetchProductos() {
             const { data, error } = await _supabase.from('productos').select('*');
             if (!error) {
@@ -273,17 +293,44 @@
 
         function renderizarProductos(productos) {
             const grid = document.getElementById('gridProductos');
-            grid.innerHTML = productos.map(prod => `
-                <div class="producto-card">
+            grid.innerHTML = productos.map(prod => {
+                // Comprobar si está oculto para aplicar la clase gris
+                const claseOculto = prod.ocultar ? 'producto-oculto' : '';
+                
+                return `
+                <div class="producto-card ${claseOculto}">
+                    <span class="producto-id">ID: ${prod.id}</span>
                     ${prod.imagen ? `<img src="${prod.imagen}" class="img-mini" alt="${prod.nombre}">` : ''}
                     <h3>${prod.nombre}</h3>
                     <p>Price: ${prod.precio} €</p>
-                    <button class="btn-editar" onclick="abrirEditor('${encodeURIComponent(prod.nombre)}')">✏️ Editar</button>
+                    
+                    <button class="btn-editar" onclick="abrirEditor('${prod.id}')">✏️ Editar</button>
+                    
+                    <label class="ocultar-label">
+                        <input type="checkbox" onchange="toggleOcultar('${prod.id}', ${prod.ocultar || false})" ${prod.ocultar ? 'checked' : ''}>
+                        Ocultar en la web
+                    </label>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
-        // --- EVENTOS DE SUBIDA ---
+        // --- FUNCION PARA ALTERNAR ESTADO DE OCULTAR ---
+        async function toggleOcultar(id, estadoActual) {
+            const nuevoEstado = !estadoActual; // Cambiamos de true a false, o de false a true
+            const { error } = await _supabase.from('productos').update({ ocultar: nuevoEstado }).eq('id', id);
+            
+            if (!error) {
+                // Actualizar la lista local y volver a renderizar sin recargar toda la página
+                const index = todosLosProductos.findIndex(p => p.id == id);
+                if(index !== -1) {
+                    todosLosProductos[index].ocultar = nuevoEstado;
+                }
+                renderizarProductos(todosLosProductos);
+            } else {
+                alert("Error al cambiar la visibilidad: " + error.message);
+            }
+        }
+
         document.getElementById('btnUploadProdImg').addEventListener('click', async () => {
             const file = document.getElementById('prodImagen').files[0];
             const cat = document.getElementById('prodCategoria').value;
@@ -307,7 +354,6 @@
             }
         });
 
-        // --- GUARDAR Y EDITAR ---
         document.getElementById('productoForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const datos = {
@@ -316,7 +362,8 @@
                 categoria: document.getElementById('prodCategoria').value,
                 Descripcion: document.getElementById('prodDesc').value,
                 marca: document.getElementById('prodMarca').value,
-                imagen: document.getElementById('prodImagenUrl').value // Aquí está la URL pública de la imagen
+                imagen: document.getElementById('prodImagenUrl').value,
+                ocultar: false // Por defecto los nuevos son visibles
             };
 
             const { error } = await _supabase.from('productos').insert([datos]);
@@ -328,12 +375,11 @@
             }
         });
 
-        function abrirEditor(nombreCodificado) {
-            const nombre = decodeURIComponent(nombreCodificado);
-            const p = todosLosProductos.find(x => x.nombre === nombre);
+        function abrirEditor(id) {
+            const p = todosLosProductos.find(x => x.id == id);
             if(!p) return;
 
-            document.getElementById('editNombreOriginal').value = p.nombre;
+            document.getElementById('editId').value = p.id;
             document.getElementById('editNombre').value = p.nombre;
             document.getElementById('editPrecio').value = p.precio;
             document.getElementById('editCategoria').value = p.categoria;
@@ -341,12 +387,16 @@
             document.getElementById('editMarca').value = p.marca || '';
             document.getElementById('editImagenUrl').value = p.imagen || '';
 
-            document.getElementById('panelEdicion').style.display = 'block';
+            const panelEdicion = document.getElementById('panelEdicion');
+            panelEdicion.style.display = 'block';
+            
+            // Hacer scroll hacia arriba automáticamente
+            panelEdicion.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         document.getElementById('formEdicion').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nombreOri = document.getElementById('editNombreOriginal').value;
+            const idEdicion = document.getElementById('editId').value;
             const datos = {
                 nombre: document.getElementById('editNombre').value,
                 precio: parseFloat(document.getElementById('editPrecio').value),
@@ -356,15 +406,28 @@
                 imagen: document.getElementById('editImagenUrl').value
             };
 
-            const { error } = await _supabase.from('productos').update(datos).eq('nombre', nombreOri);
+            const { error } = await _supabase.from('productos').update(datos).eq('id', idEdicion);
             if(!error) {
                 alert("Actualizado");
                 cerrarEdicion();
                 fetchProductos();
+            } else {
+                alert("Error: " + error.message);
             }
         });
 
         function cerrarEdicion() { document.getElementById('panelEdicion').style.display = 'none'; }
+
+        // Buscador básico integrado en el nuevo renderizado
+        document.getElementById('buscador').addEventListener('input', (e) => {
+            const termino = e.target.value.toLowerCase();
+            const filtrados = todosLosProductos.filter(p => 
+                p.nombre.toLowerCase().includes(termino) || 
+                (p.marca && p.marca.toLowerCase().includes(termino)) ||
+                p.categoria.toLowerCase().includes(termino)
+            );
+            renderizarProductos(filtrados);
+        });
 
         // Inicio
         cargarCategorias();
