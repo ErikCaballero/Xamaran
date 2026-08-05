@@ -369,6 +369,7 @@
             const { error } = await _supabase.from('productos').insert([datos]);
             if (!error) {
                 alert("Producto creado");
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 location.reload();
             } else {
                 alert("Error: " + error.message);

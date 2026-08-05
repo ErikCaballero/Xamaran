@@ -30,7 +30,7 @@ body {
       padding: 15px;
       border-bottom: 4px dashed #ff66c4;
       position: sticky;
-      top: 92px;
+      top: 113px;
       z-index: 999;
     }
 
@@ -70,6 +70,28 @@ body {
 .sticky-contact__btn:focus,.sticky-contact__btn:hover{ filter:brightness(0.96); }
 
 @media (max-width:480px){
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+
+  nav {
+    position: fixed;
+    top: var(--sticky-top-nav, 113px);
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 999;
+  }
+
+  body {
+    padding-top: var(--sticky-body-top, 180px);
+  }
+
   .sticky-contact{ left:12px; right:12px; justify-content:space-between; padding:8px 10px; gap:8px; }
   .sticky-contact__name{ display:block; font-size:0.55rem; color:#ff3fa8; font-weight:800 }
   .sticky-contact__subtitle{ display:block; font-size:0.72rem; color:#666; font-weight:600 }

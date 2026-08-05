@@ -30,6 +30,29 @@ function añadirAlCarrito(nombre, precio) {
   actualizarInterfazCarrito();
 }
 
+// NUEVO: Funciones para los botones de + y - en el modal
+function incrementarCantidad(nombre) {
+  const item = carrito.find(it => it.nombre === nombre);
+  if (item) {
+    item.cantidad += 1;
+    saveCarrito();
+    actualizarInterfazCarrito();
+  }
+}
+
+function disminuirCantidad(nombre) {
+  const item = carrito.find(it => it.nombre === nombre);
+  if (item) {
+    if (item.cantidad > 1) {
+      item.cantidad -= 1;
+      saveCarrito();
+      actualizarInterfazCarrito();
+    } else {
+      eliminarDelCarrito(nombre); // Si es 1 y se resta, lo eliminamos
+    }
+  }
+}
+
 // Eliminar un producto entero del carrito por nombre
 function eliminarDelCarrito(nombre){
   const idx = carrito.findIndex(it => it.nombre === nombre);
@@ -55,25 +78,46 @@ function actualizarInterfazCarrito() {
   if (lista) {
     lista.innerHTML = '';
     const itemsToRender = carritoExpanded ? carrito : [];
+    
     itemsToRender.forEach(item => {
       const li = document.createElement('li');
       const subtotal = (item.precio * item.cantidad).toFixed(2);
+      
+      // NUEVO: Renderizamos la lista con botones de cantidad
       li.innerHTML = `
         <div class="lista-info">
           <span class="lista-nombre">${item.nombre}</span>
-          <span class="lista-cantidad">Cantidad: ${item.cantidad}</span>
+          <div class="lista-controles-cantidad">
+            <button class="btn-qty btn-menos" type="button">-</button>
+            <span class="lista-cantidad">${item.cantidad}</span>
+            <button class="btn-qty btn-mas" type="button">+</button>
+          </div>
         </div>
         <span class="lista-subtotal">${subtotal} €</span>
       `;
-      // botón eliminar
+      
+      // Eventos de los botones + y -
+      li.querySelector('.btn-menos').addEventListener('click', (e) => {
+        e.stopPropagation();
+        disminuirCantidad(item.nombre);
+      });
+      
+      li.querySelector('.btn-mas').addEventListener('click', (e) => {
+        e.stopPropagation();
+        incrementarCantidad(item.nombre);
+      });
+
+      // botón eliminar total
       const btn = document.createElement('button');
       btn.className = 'btn-eliminar';
       btn.type = 'button';
       btn.textContent = 'Eliminar';
       btn.addEventListener('click', function(e){ e.stopPropagation(); eliminarDelCarrito(item.nombre); });
       li.appendChild(btn);
+      
       lista.appendChild(li);
     });
+    
     // Mostrar u ocultar la lista completa; el summary contiene el toggle y resumen compacto
     if (!summaryEl) {
       // fallback: always show list
@@ -191,8 +235,6 @@ function finalizarCompra(){
   const precioTotal = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0).toFixed(2);
   const itemsPlain = carrito.map(it => `${it.nombre} x${it.cantidad} — ${(it.precio * it.cantidad).toFixed(2)} €`).join('\n');
 
-  // Si alguno de los campos no es válido pero el otro sí (por ejemplo, dejaron el email vacío pero pusieron teléfono),
-  // enviamos un texto aclaratorio a la plantilla de EmailJS para que no quede raro en el correo.
   const templateParams = {
     to_name: 'Tienda Xamaran',
     from_name: clienteNombre,

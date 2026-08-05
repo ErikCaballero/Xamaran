@@ -14,38 +14,35 @@
       align-items: center;
       padding: 0 10px;
       margin-bottom: 5px;
-      border-bottom: 2px solid #f0f0f0; /* Línea sutil divisoria */
+      border-bottom: 2px solid #f0f0f0;
       padding-bottom: 8px;
     }
 
-    /* El título ocupa el espacio central de manera forzada */
     .marcas-header-container h3 {
       font-size: 1.1rem;
       color: #666;
       margin: 0;
       flex-grow: 1;
       text-align: center;
-      /* Compensamos el tamaño del botón para que el título esté en el centro perfecto */
       padding-left: 80px; 
     }
     
-    /* Botón colorido al estilo de la web y alineado a la derecha */
     .btn-toggle-marcas {
-      background: #ff4081; /* Rosa vibrante estilo chuches/dulces */
+      background: #ff4081;
       color: #ffffff;
       border: none;
       font-size: 0.85rem;
       font-weight: bold;
       cursor: pointer;
       padding: 6px 14px;
-      border-radius: 20px; /* Bordes muy redondeados e infantiles/alegres */
+      border-radius: 20px;
       box-shadow: 0 3px 6px rgba(255, 64, 129, 0.2);
       transition: all 0.2s ease;
       white-space: nowrap;
-      min-width: 80px; /* Tamaño mínimo para cuadrar la simetría */
+      min-width: 80px;
     }
     .btn-toggle-marcas:hover {
-      background: #e91e63; /* Tono ligeramente más oscuro al pasar el cursor */
+      background: #e91e63;
       transform: translateY(-1px);
       box-shadow: 0 4px 8px rgba(255, 64, 129, 0.3);
     }
@@ -101,11 +98,76 @@
       filter: grayscale(0%);
     }
 
-    /* Ajuste responsivo para pantallas pequeñas */
     @media (max-width: 480px) {
       .marcas-header-container h3 {
         padding-left: 0;
       }
+    }
+
+    .contenedor-todos-productos {
+      display: flex;
+      justify-content: center;
+      margin-top: 25px;
+      margin-bottom: 10px;
+      width: 100%;
+      clear: both;
+    }
+    .btn-todos-estilo {
+      background-color: #403444;
+      color: #ffffff;
+      text-transform: uppercase;
+      font-weight: 800;
+      font-family: 'Arial Black', sans-serif;
+      padding: 10px 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .btn-todos-estilo:hover {
+      background-color: #2b222e;
+      transform: scale(1.03);
+    }
+
+    /* NUEVOS ESTILOS: Botones de cantidad (+ / -) en el carrito */
+    .lista-controles-cantidad {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .btn-qty {
+      background-color: #ff4081;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      padding: 0;
+      line-height: 1;
+    }
+    .btn-qty:hover {
+      background-color: #e91e63;
+      transform: scale(1.1);
+    }
+    .btn-qty:active {
+      transform: scale(0.95);
+    }
+    .lista-cantidad {
+      font-weight: bold;
+      font-size: 1.1rem;
+      min-width: 20px;
+      text-align: center;
     }
   </style>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -146,11 +208,9 @@
       <label for="cliente-email">Tu email</label>
       <input id="cliente-email" type="email" placeholder="tunombre@ejemplo.com">
 
-      <!-- NUEVO: Campo de Teléfono -->
       <label for="cliente-telefono">Número de teléfono</label>
       <input id="cliente-telefono" type="tel" placeholder="Ej: 612345678">
 
-      <!-- NUEVO: Campo de Observaciones -->
       <label for="cliente-observaciones">Observaciones / Notas del pedido</label>
       <textarea id="cliente-observaciones" rows="3" placeholder="Ej: Alergias, indicaciones de entrega, cantidad de bolsas para el cumpleaños etc."></textarea>
     </div>
@@ -211,7 +271,6 @@
     </div>
     <div class="paquete" id="menualcohol">
       <img class="imagenlata botella" id="botella1" src="img/Botella.png" alt="Botella de bebida alcohólica">
-      <img class="imagenlata" id="botella2" src="img/BotellaDerramada.png" alt="Botella derramada">
       <span class="paquete-label">Bebidas Alcoholicas</span>
     </div>
     </section>
@@ -219,9 +278,12 @@
       <img class="imagenlata" src="img/Bollo.png" alt="Lata de cocalola cerrada">
       <span class="paquete-label">Varios</span>
     </div>
+
+    <div class="contenedor-todos-productos">
+      <div id="btn-mostrar-todos" class="btn-todos-estilo">Todos los productos</div>
+    </div>
   </div>
 
-  <!-- SECCIÓN DE MARCAS: Título centrado y botón a la extrema derecha -->
   <div class="section-block" style="padding: 10px 0;">
     <div class="marcas-header-container">
       <h3>Filtrar por Marca</h3>
@@ -230,8 +292,7 @@
     
     <div class="marcas-wrapper-collapsible" id="wrapper-marcas">
       <div class="marcas-discretas-grid" id="contenedor-marcas">
-        <!-- Aquí se insertarán las marcas desde JavaScript -->
-      </div>
+        </div>
     </div>
   </div>
 
@@ -243,8 +304,7 @@
     </div>
 
     <section class="grid" id="contenedor-productos">
-      <!-- Aquí se insertarán los productos desde JavaScript -->
-    </section>
+      </section>
   </div>
 
    
@@ -255,7 +315,6 @@
   </footer>
   <script>
     document.addEventListener('DOMContentLoaded', function(){
-      // preload common sounds
       const biteSound = new Audio('sonidos/Mordisco.mp3');
       biteSound.preload = 'auto';
       biteSound.volume = 0.9;
@@ -264,7 +323,6 @@
 
       document.querySelectorAll('.paquete').forEach(function(p){
         p.style.cursor = 'pointer';
-        // --- cycling behavior for chocolate and helado (if multiple images present) ---
         ['imagenchocolate', 'imagenhelado'].forEach(function(cls){
           const imgs = Array.from(p.querySelectorAll('img.' + cls));
           if (imgs.length >= 2) {
@@ -276,7 +334,6 @@
             let intervalId = null;
 
             p.addEventListener('mouseenter', function(){
-              // play sound once on hover (use LamerHelados for menuhelados)
               try {
                 if (!p._hoverAudio) {
                   const src = (p.id === 'menuhelados') ? 'sonidos/LamerHelado.mp3' : 'sonidos/Mordisco.mp3';
@@ -304,10 +361,8 @@
           }
         });
 
-        // --- shake sound loop for paquetes with imagenpaquete ---
         const packImg = p.querySelector('img.imagenpaquete');
         if (packImg) {
-          // create a dedicated audio instance per paquete so multiple hovers can play independently
           const shakeAudio = new Audio(shakeSrc);
           shakeAudio.preload = 'auto';
           shakeAudio.loop = false;
@@ -326,7 +381,6 @@
           });
         }
 
-        // --- special behavior for menulata: play Lataabierta once and swap image once per hover ---
         const lataImgs = Array.from(p.querySelectorAll('img.imagenlata'));
         if (p.id === 'menulata' && lataImgs.length >= 2) {
           const srcs = lataImgs.map(function(i){ return i.src; });
@@ -341,7 +395,7 @@
           let opened = false;
 
           p.addEventListener('mouseenter', function(){
-            if (opened) return; // ensure it happens once per hover
+            if (opened) return; 
             opened = true;
             main.src = srcs[1];
             try {
@@ -359,10 +413,8 @@
           });
         }
 
-        // --- play malabares sound when hovering any of the r elements (.r1, .r2, .r3) ---
         const rEls = Array.from(p.querySelectorAll('.r1, .r2, .r3'));
         if (rEls.length) {
-          // use specific malabares sound for the menuchuches block, otherwise fallback to shakeSrc
           const malabaresSrc = (p.id === 'menuchuches') ? 'sonidos/Malabares.mp3' : shakeSrc;
           const malabaresAudio = new Audio(malabaresSrc);
           malabaresAudio.preload = 'auto';
@@ -386,7 +438,6 @@
     });
   </script>
   <script>
-    // Animación de galleta: exit -> enter -> restore
     (function(){
       const paquete = document.getElementById('menugalletas');
       if(!paquete) return;
@@ -398,21 +449,16 @@
       paquete.addEventListener('mouseenter', function(){
         if(running) return;
         running = true;
-        // iniciar salida hacia la derecha
         g.style.animation = 'galletaExit 700ms cubic-bezier(.22,.9,.1,1) forwards';
       });
 
       g.addEventListener('animationend', function(e){
         if(e.animationName === 'galletaExit'){
-          // situar fuera a la izquierda inmediatamente (sin transición)
           g.style.animation = '';
           g.style.left = '-40%';
-          // forzar reflow para que el siguiente animation empiece limpio
           void g.offsetWidth;
-          // iniciar entrada desde la izquierda hasta centro
           g.style.animation = 'galletaEnter 700ms cubic-bezier(.22,.9,.1,1) forwards';
         } else if(e.animationName === 'galletaEnter'){
-          // animación completa: limpiar y restaurar estilo final
           g.style.animation = '';
           g.style.left = '50%';
           g.style.transform = 'translate(-50%, -50%) rotate(0deg)';
@@ -422,7 +468,6 @@
     })();
   </script>
   <script>
-    // Frutos secos: apilar imágenes, subir en hover y bajar con caída independiente
     (function(){
       const cont = document.getElementById('menufrutossecos');
       if(!cont) return;
@@ -431,7 +476,6 @@
       let fallingTimeout = null;
 
       cont.addEventListener('mouseenter', ()=>{
-        // stop any in-progress fall and make all images lift (using CSS vars defined in Productos.css)
         cont.classList.remove('fall');
         if(fallingTimeout){ clearTimeout(fallingTimeout); fallingTimeout = null }
         imgs.forEach(i=> i.style.animationDelay = '');
@@ -439,17 +483,13 @@
       });
 
       cont.addEventListener('mouseleave', ()=>{
-        // keep the 'lift' state while we prepare the staggered fall
         imgs.forEach((img, idx)=>{
-          // stagger delays so they fall independently
           const delay = (idx * 100) + Math.floor(Math.random()*120);
           img.style.animationDelay = delay + 'ms';
         });
 
-        // small timeout to ensure delays are applied then trigger the fall animation
         fallingTimeout = setTimeout(()=>{
           cont.classList.add('fall');
-          // when all animations finish, cleanup classes and inline delays
           let finished = 0;
           imgs.forEach((img)=>{
             const handler = function(){
@@ -589,7 +629,6 @@
       });
     }
 
-    // EVENTO: Búsqueda por nombre
     inputBuscador.addEventListener('input', (e) => {
       const texto = e.target.value.toLowerCase();
       const filtrados = todosLosProductos.filter(prod => 
@@ -598,7 +637,6 @@
       renderizarProductos(filtrados);
     });
 
-    // EVENTO: Filtrado por categorías (clic en iconos)
     document.querySelectorAll('.paquete').forEach(paquete => {
       paquete.addEventListener('click', () => {
         const nombreCategoriaDB = mapaCategorias[paquete.id];
@@ -613,7 +651,15 @@
       });
     });
 
-    // CONTROLADOR DE COLAPSO: Cambia el texto dinámicamente manteniendo el estilo limpio
+    const btnMostrarTodos = document.getElementById('btn-mostrar-todos');
+    if (btnMostrarTodos) {
+      btnMostrarTodos.addEventListener('click', () => {
+        inputBuscador.value = ""; 
+        renderizarProductos(todosLosProductos); 
+        contenedorProductos.scrollIntoView({ behavior: 'smooth' }); 
+      });
+    }
+
     document.getElementById('btn-colapsar-marcas').addEventListener('click', function() {
       const wrapper = document.getElementById('wrapper-marcas');
       wrapper.classList.toggle('collapsed');
@@ -630,6 +676,6 @@
       cargarMarcas();
     });
   </script>
-  
+  <script src="sticky-header.js"></script>
 </body>
 </html>
